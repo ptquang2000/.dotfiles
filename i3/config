@@ -193,11 +193,8 @@ bindsym $mod+r mode "resize"
 default_border pixel 0
 default_floating_border pixel 0
 
-assign [class="Brave-browser"] $ws2
+assign [class="Google-chrome"] $ws2
 assign [class="Alacritty"] $ws3
-assign [class="bottles"] $ws1
-assign [class="firefox.exe"] $ws10
-assign [class="idman.exe"] $ws9
 
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id feh --bg-scale $HOME/Downloads/wallpaper.jpg
