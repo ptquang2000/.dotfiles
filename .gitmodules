@@ -1,3 +1,6 @@
 [submodule "nvim"]
 	path = nvim
 	url = https://github.com/ptquang2000/kickstart.nvim
+[submodule "rofi"]
+	path = rofi
+	url = https://github.com/adi1090x/rofi.git
