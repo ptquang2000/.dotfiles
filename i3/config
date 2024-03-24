@@ -201,3 +201,5 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id feh --bg-scale $HOME/.dotfiles/assets/wallpaper.jpg
 exec_always --no-startup-id picom -b
 exec --no-startup-id i3-msg 'exec google-chrome-stable; exec alacritty; workspace $ws1'
+
+bindsym $mod+Shift+s exec $HOME/.local/share/bin/snipping-tool.sh
