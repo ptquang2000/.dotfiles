@@ -9,5 +9,7 @@ fi
 if [ -f $dest_path$filename ]; then
 	filename=$filename.1
 fi
-maim -s --hidecursor $dest$filename$ext
+filepath=$dest$filename$ext
+maim -s --hidecursor $filepath
+mupdf $filepath
 
