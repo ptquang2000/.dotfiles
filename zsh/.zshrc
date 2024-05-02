@@ -30,7 +30,11 @@ bindkey '^[[B' history-substring-search-down
 bindkey "^[[1;5D" backward-word 
 bindkey "^[[1;5C" forward-word
 bindkey "^[[3~" delete-char
-bindkey "^H" vi-backward-kill-word
+bindkey "^[[3;5~" delete-word
+bindkey "^H" backward-delete-word
+bindkey "^[[1~" beginning-of-line
+bindkey "^[[4~" end-of-line
+bindkey -r "^["
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
