@@ -24,21 +24,31 @@ source ~/.config/zsh/zsh-history-substring-search/zsh-history-substring-search.p
 source ~/.config/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh
 source ~/.config/zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
 
-bindkey -s '\C-_' 'zsh ~/.local/bin/tmux-sessionizer^M'
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-bindkey "^[[1;5D" backward-word 
-bindkey "^[[1;5C" forward-word
-bindkey "^[[3~" delete-char
-bindkey "^[[3;5~" delete-word
-bindkey "^H" backward-delete-word
-bindkey "^[[1~" beginning-of-line
-bindkey "^[[4~" end-of-line
+bindkey "^[[A"			history-substring-search-up
+bindkey "^[[B" 			history-substring-search-down
+
+bindkey "^ " 			autosuggest-accept
+
+bindkey "^I"			menu-select
+bindkey "$terminfo[kcbt]" 	menu-select
+
+bindkey "^[[1;5D" 		backward-word 
+bindkey "^[[1;5C" 		forward-word
+bindkey "^[[3~" 		delete-char
+bindkey "^[[3;5~" 		delete-word
+bindkey "^H" 			backward-delete-word
+bindkey "^[[1~" 		beginning-of-line
+bindkey "^A" 			beginning-of-line
+bindkey "^[[4~" 		end-of-line
+bindkey "^E" 			end-of-line
+
+bindkey -s "\C-_" 		"zsh ~/.local/bin/tmux-sessionizer^M"
 bindkey -r "^["
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
-zstyle ':completion:*' menu select
+zstyle ':completion:*' menuselect
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle -e ':autocomplete:*:*' list-lines 'reply=( $(( LINES / 3 )) )'
 
 alias clear='clear && history -p && printf "\e[3J"'
