@@ -195,7 +195,6 @@ default_floating_border pixel 0
 
 assign [class="Google-chrome"] $ws2
 assign [class="Alacritty"] $ws3
-assign [class="firefoxdeveloperedition"] $ws9
 assign [class="Zathura"] $ws10
 
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
