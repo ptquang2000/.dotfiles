@@ -38,8 +38,10 @@ bindkey "^[[3~" 		delete-char
 bindkey "^[[3;5~" 		delete-word
 bindkey "^H" 			backward-delete-word
 bindkey "^[[1~" 		beginning-of-line
+bindkey "^[[H"			beginning-of-line
 bindkey "^A" 			beginning-of-line
 bindkey "^[[4~" 		end-of-line
+bindkey "^[[F"			end-of-line
 bindkey "^E" 			end-of-line
 
 bindkey -s "\C-_" 		"zsh ~/.local/bin/tmux-sessionizer^M"

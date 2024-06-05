@@ -193,11 +193,12 @@ bindsym $mod+r mode "resize"
 default_border pixel 0
 default_floating_border pixel 0
 
-assign [class="firefoxdeveloperedition"] $ws1
+assign [class="Zathura"] $ws1
 assign [class="Alacritty"] $ws2
 assign [class="Google-chrome"] $ws3
-assign [class="obsidian"] $ws9
-assign [class="Zathura"] $ws10
+assign [class="obsidian"] $ws4
+
+assign [class="firefoxdeveloperedition"] $ws10
 
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id feh --bg-scale $HOME/.dotfiles/assets/wallpaper.jpg
