@@ -2,9 +2,6 @@
 	path = nvim
 	url = https://github.com/ptquang2000/kickstart.nvim
 	ignore = untracked
-[submodule "rofi"]
-	path = rofi
-	url = https://github.com/adi1090x/rofi.git
 [submodule "zsh/zsh-autosuggestions"]
 	path = zsh/zsh-autosuggestions
 	url = https://github.com/zsh-users/zsh-autosuggestions
