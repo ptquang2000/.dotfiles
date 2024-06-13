@@ -190,6 +190,8 @@ bindsym $mod+r mode "resize"
 #        status_command i3status
 #}
 
+for_window [class="Yad" title="yad-calendar"] floating enable
+
 default_border pixel 0
 default_floating_border pixel 0
 
@@ -198,7 +200,7 @@ assign [class="Alacritty"] $ws2
 assign [class="Google-chrome"] $ws3
 assign [class="obsidian"] $ws4
 
-assign [class="^(?i).*"] $ws10
+assign [class="^(?i)(?!Yad).*"] $ws10
 
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id feh --bg-scale $HOME/.dotfiles/assets/wallpaper.jpg
