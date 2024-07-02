@@ -2,7 +2,7 @@
 
 filename=screenshot-$(date +"%Y%m%d-%H-%M-%S")
 ext=.png
-dest=~/pictures/
+dest=~/Pictures/
 if [ ! -d $dest_path ]; then
 	mkdir $dest
 fi

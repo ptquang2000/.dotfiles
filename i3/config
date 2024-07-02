@@ -207,6 +207,7 @@ client.background       $bg
 
 workspace_layout tabbed
 for_window [class="Yad" title="yad-calendar"] floating enable
+for_window [class="[.]*"] fullscreen disable
 
 default_border pixel 0
 default_floating_border pixel 0
@@ -227,4 +228,4 @@ exec --no-startup-id alacritty
 exec --no-startup-id zathura --fork
 exec --no-startup-id i3-msg 'workspace $ws2'
 
-bindsym $mod+Shift+s exec $HOME/.local/share/bin/snipping-tool.sh
+bindsym $mod+Shift+s exec ~/.local/bin/snipping-tool.sh
