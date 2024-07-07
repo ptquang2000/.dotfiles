@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-vpn_status=$(curl -s https://www.cloudflare.com/cdn-cgi/trace/ | grep warp | awk -F'=' '{print $2}')
-
-if [ "$vpn_status" = "on" ]; then
-    echo " on"
-else
-    echo " off"
-fi
