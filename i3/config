@@ -114,10 +114,10 @@ bindsym $mod+a focus parent
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
-set $ws1 "1:󰈙"
+set $ws1 "1:"
 set $ws2 "2:"
 set $ws3 "3:"
-set $ws4 "4:󰣆"
+set $ws4 "4:󰈙"
 set $ws5 "5:󰣆"
 set $ws6 "6:󰣆"
 set $ws7 "7:󰣆"
@@ -194,9 +194,6 @@ set $purple   #d3869b
 set $aqua     #89b482
 set $darkgray #282828
 
-#######################
-#### i3 appearance ####
-#######################
 #       Gruvbox Theme   brdr        bg          text    indictr     chld_brdr
 client.focused          $yellow     $yellow     $bg     $yellow     $yellow
 client.focused_inactive $aqua       $aqua       $bg     $aqua       $aqua
@@ -206,27 +203,27 @@ client.placeholder      $bg         $bg         $bg     $bg         $bg
 client.background       $bg
 
 workspace_layout tabbed
-for_window [class="Yad" title="yad-calendar"] floating enable
-for_window [class="[.]*"] fullscreen disable
 
-default_border pixel 0
+default_border          pixel 0
 default_floating_border pixel 0
 
-assign [class="Zathura"] $ws1
-assign [class="Alacritty"] $ws2
-assign [class="Google-chrome"] $ws3
-assign [class="obsidian"] $ws4
+for_window [class="[.]*"]                       fullscreen disable
+for_window [class="Alacritty"]                  fullscreen enable
+for_window [class="Yad" title="yad-calendar"]   floating enable
 
-assign [class="^(?i)(?!Yad).*"] $ws10
+assign [instance="^google-chrome$"]     $ws1
+assign [class="Alacritty"]              $ws2
+assign [instance="google-chrome-dev"]   $ws3
+assign [class="Zathura"]                $ws4
+assign [class="^(?i)(?!Yad).*"]         $ws10
 
-exec_always --no-startup-id $HOME/.config/polybar/launch.sh
+exec_always --no-startup-id google-chrome-stable --user-data-dir=/home/quang/google-chrome-dev
 exec_always --no-startup-id feh --bg-scale $HOME/.dotfiles/assets/wallpaper.jpg
+exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id picom -b
-exec --no-startup-id --no-startup-id ibus-daemon --xim -d -r
+
 exec --no-startup-id google-chrome-stable
-exec --no-startup-id alacritty
-exec --no-startup-id zathura --fork
-exec --no-startup-id i3-msg 'workspace $ws2'
+exec --no-startup-id ibus-daemon --xim -d -r
 
 bindsym $mod+Shift+s exec ~/.local/bin/snipping-tool.sh
 #bindsym $mod+d exec --no-startup-id polybar-msg -p $(xdotool search --name polybar-dock getwindowpid) cmd toggle
