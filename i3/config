@@ -217,12 +217,12 @@ assign [instance="google-chrome-dev"]   $ws3
 assign [class="Zathura"]                $ws4
 assign [class="^(?i)(?!Yad).*"]         $ws10
 
-exec_always --no-startup-id google-chrome-stable --user-data-dir=/home/quang/google-chrome-dev
 exec_always --no-startup-id feh --bg-scale $HOME/.dotfiles/assets/wallpaper.jpg
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 exec_always --no-startup-id picom -b
 
-exec --no-startup-id google-chrome-stable
+#should make a copy from /usr/share/applications/google-chrome.desktop
+#exec --no-startup-id google-chrome-stable --user-data-dir=/home/quang/google-chrome-dev
 exec --no-startup-id ibus-daemon --xim -d -r
 
 bindsym $mod+Shift+s exec ~/.local/bin/snipping-tool.sh
