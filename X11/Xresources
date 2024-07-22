@@ -61,10 +61,11 @@
 *.vt100.faceSize: 10
 
 ! Specific options
-*selectToClipboard: true 
-*VT100.Translations: #override \
-                 Ctrl Shift <Key>V:    insert-selection(CLIPBOARD) \n\
-                 Ctrl Shift <Key>C:    copy-selection(CLIPBOARD)
+*.vt100.selectToClipboard: true 
+*.vt100.translations: #override \
+	<Btn1Up>:		select-end(PRIMARY, CLIPBOARD) \n\
+	Ctrl Shift <Key>V:	insert-selection(CLIPBOARD) \n\
+	Ctrl Shift <Key>C:	copy-selection(CLIPBOARD)
 *.vt100.metaSendsEscape: true
 *.vt100.backarrowKey: false
 *.ttyModes: erase ^?

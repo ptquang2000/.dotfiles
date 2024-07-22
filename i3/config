@@ -212,10 +212,10 @@ set $title "^(?i)(?!yad-calendar)(?!DSearch).*"
 
 for_window [title="DSearch"]                    floating enable
 for_window [class="Yad" title="yad-calendar"]   floating enable
+for_window [title="uxterm"]                     move container to workspace $ws2
 
 assign [class=$class title=$title]              $ws10
 assign [instance="^google-chrome$"]             $ws1
-assign [title="uxterm"]                         $ws2
 assign [instance="google-chrome-dev"]           $ws3
 assign [class="Zathura"]                        $ws4
 
