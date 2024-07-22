@@ -7,19 +7,19 @@ TERM = "alacritty"
 size = 10.0
 
 [font.bold]
-family = "JetBrains Mono NL"
+family = "JetBrains Mono"
 style = "Bold"
 
 [font.bold_italic]
-family = "JetBrains Mono NL"
+family = "JetBrains Mono"
 style = "Bold Italic"
 
 [font.italic]
-family = "JetBrains Mono NL"
+family = "JetBrains Mono"
 style = "Italic"
 
 [font.normal]
-family = "JetBrains Mono NL"
+family = "JetBrains Mono"
 style = "Regular"
 
 [scrolling]

@@ -1,6 +1,6 @@
 # default apps
 export EDITOR="nvim"
-export TERMINAL="alacritty"
+export TERMINAL="uxterm"
 export BROWSER="google-chrome-stable"
 #
 # Adds ~/.local/bin and subfolders to $PATH
