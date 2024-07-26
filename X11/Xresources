@@ -58,7 +58,7 @@
 ! Fonts
 *.vt100.renderFont: true
 *.vt100.faceName: \n\
-		xft:FiraMono Nerd Font:style=Regular, \n\
+		xft:FiraMono Nerd Font Mono:style=Regular, \n\
 		xft:Font Awesome 6 Free:style=Regular, \n\
 		xft:Font Awesome 6 Free:style=Solid, \n\
 		xft:Font Awesome v4 Compatibility:style=Regular
