@@ -57,8 +57,14 @@
 
 ! Fonts
 *.vt100.renderFont: true
-*.vt100.faceName: JetBrains Mono:style=Regular
-*.vt100.faceSize: 10
+*.vt100.faceName: \n\
+		xft:FiraMono Nerd Font:style=Regular, \n\
+		xft:Font Awesome 6 Free:style=Regular, \n\
+		xft:Font Awesome 6 Free:style=Solid, \n\
+		xft:Font Awesome v4 Compatibility:style=Regular
+
+*.vt100.faceSize: 13
+*.vt100.geometry: 80x24
 
 ! Specific options
 *.vt100.selectToClipboard: true 
