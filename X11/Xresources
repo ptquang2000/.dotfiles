@@ -58,16 +58,15 @@
 ! Fonts
 *.vt100.renderFont: true
 *.vt100.faceName: \n\
-		xft:FiraMono Nerd Font Mono:style=Regular, \n\
-		xft:Font Awesome 6 Free:style=Regular, \n\
-		xft:Font Awesome 6 Free:style=Solid, \n\
-		xft:Font Awesome v4 Compatibility:style=Regular
+		xft:Hasklug Nerd Font Mono:style=Regular, \n\
+		xft:Font Awesome 6 Free:style=Regular
 
 *.vt100.faceSize: 13
 *.vt100.geometry: 80x24
 
 ! Specific options
 *.vt100.selectToClipboard: true 
+xterm*disallowedWindowOps: 20,21,SetXProp
 *.vt100.translations: #override \
 	<Btn1Up>:		select-end(PRIMARY, CLIPBOARD) \n\
 	Ctrl Shift <Key>V:	insert-selection(CLIPBOARD) \n\

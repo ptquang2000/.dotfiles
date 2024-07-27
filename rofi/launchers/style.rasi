@@ -8,7 +8,7 @@
  */
 
 configuration {
-	font:			"FiraMono Nerd Font 10 Mono";
+	font:			"Hasklug Nerd Font Mono 11";
 	show-icons:             true;
 	icon-theme: 		"Papirus";
 	display-drun: 		"";
