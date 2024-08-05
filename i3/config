@@ -13,7 +13,7 @@ set $mod Mod1
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:Hasklug Nerd Font Mono 13
+font pango:DaddyTimeMono Nerd Font Mono 13
 font pango:Font Awesome 6 Free 13
 font pango:Font Awesome 6 Free 13
 font pango:Font Awesome v4 Compatibility 13
@@ -113,16 +113,16 @@ bindsym $mod+a focus parent
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
-set $ws1 "1:"
-set $ws2 "2:"
-set $ws3 "3:"
-set $ws4 "4:󰈙"
-set $ws5 "5:󰣆"
-set $ws6 "6:󰣆"
-set $ws7 "7:󰣆"
-set $ws8 "8:󰣆"
-set $ws9 "9:󰣆"
-set $ws10 "10:󰣆"
+set $ws1 "1:󰊯"
+set $ws2 "2:"
+set $ws3 "3:"
+set $ws4 "4:"
+set $ws5 "5:󰘔"
+set $ws6 "6:󰘔"
+set $ws7 "7:󰘔"
+set $ws8 "8:󰘔"
+set $ws9 "9:󰘔"
+set $ws10 "10:󰘔"
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
@@ -207,9 +207,9 @@ default_border          pixel 0
 default_floating_border pixel 0
 
 set $class "^(?i)(?!Yad)(?!DSearch).*"
-set $title "^(?i)(?!yad-calendar)(?!DSearch).*"
+set $title "^(?i)(?!yad-calendar).*"
 
-for_window [title="DSearch"]                    floating enable
+for_window [class="DSearch"]                    floating enable
 for_window [class="Yad" title="yad-calendar"]   floating enable
 
 assign [instance="^google-chrome$"]             $ws1
@@ -232,4 +232,4 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 # Custom keys binding
 #bindsym $mod+d exec --no-startup-id polybar-msg -p $(xdotool search --name polybar-dock getwindowpid) cmd toggle
 bindsym $mod+Shift+s exec ~/.local/bin/snipping-tool.sh
-bindsym $mod+Shift+d exec $TERMINAL -e ~/dsearch/build/dsearch -debug
+bindsym $mod+Shift+d exec $TERMINAL -class DSearch -e ~/dsearch/build/dsearch -DEBUG

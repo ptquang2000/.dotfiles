@@ -58,8 +58,8 @@
 ! Fonts
 *.vt100.renderFont: true
 *.vt100.faceName: \n\
-		xft:Hasklug Nerd Font Mono:style=Regular, \n\
-		xft:Font Awesome 6 Free:style=Regular
+		xft:DaddyTimeMono Nerd Font Mono, \n\
+		xft:Font Awesome 6 Free
 
 *.vt100.faceSize: 13
 *.vt100.geometry: 80x24
