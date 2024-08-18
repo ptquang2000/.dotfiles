@@ -233,3 +233,8 @@ exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 #bindsym $mod+d exec --no-startup-id polybar-msg -p $(xdotool search --name polybar-dock getwindowpid) cmd toggle
 bindsym $mod+Shift+s exec ~/.local/bin/snipping-tool.sh
 bindsym $mod+Shift+d exec $TERMINAL -class DSearch -e ~/dsearch/build/dsearch -DEBUG
+
+#bar {
+#    status_command i3status
+#    font pango:DaddyTimeMono Nerd Font Mono, Symbols Nerd Font Mono 13px
+#}
