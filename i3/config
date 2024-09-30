@@ -121,8 +121,8 @@ set $ws5 "5:󰘔"
 set $ws6 "6:󰘔"
 set $ws7 "7:󰘔"
 set $ws8 "8:󰘔"
-set $ws9 "9:󰘔"
-set $ws10 "10:󰘔"
+set $ws9 "9:󰕼"
+set $ws10 "10:󰈹"
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
@@ -216,7 +216,9 @@ assign [instance="^google-chrome$"]             $ws1
 assign [title="uxterm"]                         $ws2
 assign [instance="google-chrome-dev"]           $ws3
 assign [class="Zathura"]                        $ws4
-assign [class=$class title=$title]              $ws10
+assign [class="vlc"]                            $ws9
+assign [class="firefox-developer-edition"]      $ws10
+assign [class=$class title=$title]              $ws5
 
 # Start once at boot
 exec --no-startup-id ibus-daemon --xim -d -r
