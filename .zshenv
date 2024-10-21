@@ -1,7 +1,7 @@
 # default apps
 export EDITOR="nvim"
-export TERMINAL="uxterm"
-export BROWSER="google-chrome-stable"
+export TERM="kitty"
+export BROWSER="google-chrome"
 #
 # Adds ~/.local/bin and subfolders to $PATH
 export PATH="$PATH:${$(find ~/.local/bin -maxdepth 1 -type d -printf %p:)%%:}"
