@@ -58,7 +58,7 @@
 ! Fonts
 *.vt100.renderFont: true
 *.vt100.faceName: \n\
-		xft:DaddyTimeMono Nerd Font Mono, \n\
+		xft:CaskaydiaCove Nerd Font Mono, \n\
 		xft:Font Awesome 6 Free
 
 *.vt100.faceSize: 13
