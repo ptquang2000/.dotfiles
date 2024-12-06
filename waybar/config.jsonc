@@ -17,8 +17,6 @@
     ],
     "modules-right": [
         "mpris",
-        "idle_inhibitor",
-        "load",
         "pulseaudio",
         "network",
         "clock",
@@ -43,7 +41,7 @@
     },
     "hyprland/window": {
         "format": "{title}",
-        "max-length": 40,
+        "max-length": 120,
         "all-outputs": true
     },
     "mpris": {
@@ -85,7 +83,7 @@
     "clock": {
         // "timezone": "America/New_York",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format-alt": "{:%Y-%m-%d}"
+        "format": "{:%H:%M %Y-%m-%d}"
     },
     "cpu": {
         "format": "{usage}% ",

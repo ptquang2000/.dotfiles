@@ -6,14 +6,14 @@
 }
 
 window#waybar {
-    font-family: FontAwesome, "Symbols Nerd Font", "CaskaydiaCove Nerd Font Mono", monospace;
+    font-family: FontAwesome, "Symbols Nerd Font", "CaskaydiaCove Nerd Font", monospace;
     background: transparent;
     color: white;
 }
 
 #window {
     font-weight: bold;
-    font-family: "CaskaydiaCove Nerd Font Mono";
+    font-family: "CaskaydiaCove Nerd Font";
 }
 /*
 #workspaces {
