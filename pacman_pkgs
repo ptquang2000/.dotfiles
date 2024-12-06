@@ -11,6 +11,7 @@ git
 gnome-themes-extra
 hyprpaper
 kitty
+neovim
 noto-fonts-cjk
 noto-fonts-emoji
 ripgrep
@@ -19,5 +20,6 @@ tmux
 ttf-cascadia-code-nerd
 unzip
 waybar
+zathura
 zip
 zsh
