@@ -11,6 +11,7 @@ gvfs
 hypridle
 hyprpaper
 less
+mupdf
 neovim
 noto-fonts-cjk
 noto-fonts-emoji
@@ -22,5 +23,6 @@ ttf-cascadia-code-nerd
 unzip
 waybar
 zathura
+zathura-pdf-mupdf
 zip
 zsh
