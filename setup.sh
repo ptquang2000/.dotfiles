@@ -51,3 +51,4 @@ rm -rf ./yay
 echo TODO:
 echo - Setup github SSH key
 echo - Start and Enable reflector.timer
+echo - Enable chrome wayland flags
