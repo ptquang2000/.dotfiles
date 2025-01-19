@@ -17,7 +17,7 @@ makepkg -si
 cd -
 
 echo Doing yay install
-sudo pacman -Sy - < ./yay_pkgs
+yay -Sy - < ./yay_pkgs
 
 echo Updating submodules
 git submodule update --init --recursive
@@ -48,5 +48,6 @@ echo Cleaning up
 rm -rf ./where-is-my-sddm-theme
 rm -rf ./yay
 
-echo TODO
+echo TODO:
 echo - Setup github SSH key
+echo - Start and Enable reflector.timer
