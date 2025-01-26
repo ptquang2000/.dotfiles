@@ -8,7 +8,7 @@ echo CONFIG_PATH=${config_path}
 echo local_path=${local_path}
 
 echo Doing pacman install
-sudo pacman -Sy - < ./pacman_pkgs
+sudo pacman -Sy --noconfirm - < ./pacman_pkgs
 
 echo Installing yay
 git clone https://aur.archlinux.org/yay.git
@@ -17,7 +17,7 @@ makepkg -si
 cd -
 
 echo Doing yay install
-yay -Sy - < ./yay_pkgs
+yay -Sy - --noconfirm < ./yay_pkgs
 
 echo Updating submodules
 git submodule update --init --recursive
