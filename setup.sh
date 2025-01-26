@@ -31,7 +31,7 @@ ln -sf $(pwd)/tmux ${config_path}
 ln -sf $(pwd)/waybar ${config_path}
 ln -sf $(pwd)/zathura ${config_path}
 ln -sf $(pwd)/zsh ${config_path}
-ln -sf $(pwd)/.local/bin ${local_path}
+ln -sf $(pwd)/.local/bin ${local_path}/bin
 
 echo Setting default shell to zsh
 chsh -s /usr/bin/zsh
