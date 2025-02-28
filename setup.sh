@@ -36,6 +36,9 @@ ln -sf $(pwd)/.local/bin ${local_path}/bin
 echo Setting default shell to zsh
 chsh -s /usr/bin/zsh
 
+echo Setting default apps
+xdg-mime default org.pwmt.zathura.desktop application/pdf
+
 echo Setting sddm themes
 git clone https://github.com/stepanzubkov/where-is-my-sddm-theme.git
 cd ./where-is-my-sddm-theme
@@ -52,3 +55,4 @@ echo TODO:
 echo - Setup github SSH key
 echo - Start and Enable reflector.timer
 echo - Enable chrome wayland flags
+echo - Set background image in sddm theme
