@@ -56,7 +56,7 @@ rm -rf ./where-is-my-sddm-theme
 rm -rf ./yay
 
 echo Create directories
-mkdir ~/Downloads/ ~/Pictures/
+mkdir -p ~/Downloads/ ~/Pictures/
 
 echo TODO:
 echo - Setup github SSH key
