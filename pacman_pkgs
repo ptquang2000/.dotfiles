@@ -1,3 +1,4 @@
+anki
 base-devel
 bear
 bemenu-wayland
@@ -8,6 +9,7 @@ fzf
 gimp
 git
 gnome-themes-extra
+grim
 gvfs
 hypridle
 hyprpaper
@@ -21,6 +23,7 @@ noto-fonts-emoji
 qt6-5compat
 ripgrep
 reflector
+slurp
 thunar
 thunar-volman
 tmux

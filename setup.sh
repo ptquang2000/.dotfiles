@@ -55,8 +55,10 @@ echo Cleaning up
 rm -rf ./where-is-my-sddm-theme
 rm -rf ./yay
 
+echo Create directories
+mkdir ~/Downloads/ ~/Pictures/
+
 echo TODO:
 echo - Setup github SSH key
-echo - Start and Enable reflector.timer
 echo - Enable chrome wayland flags
 echo - Set background image in sddm theme
