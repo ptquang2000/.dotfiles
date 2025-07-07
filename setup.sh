@@ -39,9 +39,10 @@ chsh -s /usr/bin/zsh
 echo Setting default apps
 xdg-mime default org.pwmt.zathura.desktop application/pdf
 
-echo Enable reflector
+echo Start services
 sudo systemctl enable reflector.service
 sudo systemctl start reflector.service
+sudo systemctl --user enable --now waybar.service
 
 echo Setting sddm themes
 git clone https://github.com/stepanzubkov/where-is-my-sddm-theme.git
