@@ -7,14 +7,14 @@ sddm_bg=./assets/wallpaper.jpg
 echo CONFIG_PATH=${config_path}
 echo local_path=${local_path}
 
-echo Doing pacman install
-yay -Sy --noconfirm - < ./pacman_pkgs
-
 echo Installing yay
 git clone https://aur.archlinux.org/yay.git
 cd ./yay
 makepkg -si
 cd -
+
+echo Doing pacman install
+yay -Sy --noconfirm - < ./pacman_pkgs
 
 echo Doing yay install
 yay -Sy --noconfirm - < ./yay_pkgs
