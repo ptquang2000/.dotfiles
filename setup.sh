@@ -22,16 +22,26 @@ yay -Sy --noconfirm - < ./yay_pkgs
 echo Updating submodules
 git submodule update --init --recursive
 
-echo Creating symbolic links 
+echo Creating symbolic links
+rm -rf ${HOME}/.zshenv
 ln -sf $(pwd)/.zshenv ${HOME}
+rm -rf ${HOME}/hypr
 ln -sf $(pwd)/hypr ${config_path}
+rm -rf ${HOME}/kitty
 ln -sf $(pwd)/kitty ${config_path}
+rm -rf ${HOME}/nvim
 ln -sf $(pwd)/nvim ${config_path}
+rm -rf ${HOME}/tmux
 ln -sf $(pwd)/tmux ${config_path}
+rm -rf ${HOME}/waybar
 ln -sf $(pwd)/waybar ${config_path}
+rm -rf ${HOME}/zathura
 ln -sf $(pwd)/zathura ${config_path}
+rm -rf ${HOME}/zsh
 ln -sf $(pwd)/zsh ${config_path}
-ln -sf $(pwd)/.local/bin ${local_path}/bin
+mkdir -p ${HOME}/.local
+rm -rf ${local_path}/bin
+ln -sf $(pwd)/.local/bin ${local_path}
 
 echo Setting default shell to zsh
 chsh -s /usr/bin/zsh
