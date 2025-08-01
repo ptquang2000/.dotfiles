@@ -8,7 +8,7 @@ echo CONFIG_PATH=${config_path}
 echo local_path=${local_path}
 
 echo Doing pacman install
-sudo pacman -Sy --noconfirm - < ./pacman_pkgs
+yay -Sy --noconfirm - < ./pacman_pkgs
 
 echo Installing yay
 git clone https://aur.archlinux.org/yay.git
@@ -17,7 +17,7 @@ makepkg -si
 cd -
 
 echo Doing yay install
-yay -Sy - --noconfirm < ./yay_pkgs
+yay -Sy --noconfirm - < ./yay_pkgs
 
 echo Updating submodules
 git submodule update --init --recursive
@@ -40,12 +40,12 @@ echo Setting default apps
 xdg-mime default org.pwmt.zathura.desktop application/pdf
 
 echo Start services
-sudo systemctl enable reflector.service
-sudo systemctl start reflector.service
-sudo systemctl --user enable --now waybar.service
+systemctl enable reflector.service
+systemctl start reflector.service
+systemctl --user enable --now waybar.service
 
 echo Setting sddm themes
-git clone https://github.com/stepanzubkov/where-is-my-sddm-theme.git
+git clone https://github.com/ptquang2000/where-is-my-sddm-theme.git
 cd ./where-is-my-sddm-theme
 sudo sh install.sh
 cd -
@@ -61,5 +61,3 @@ mkdir -p ~/Downloads/ ~/Pictures/
 
 echo TODO:
 echo - Setup github SSH key
-echo - Enable chrome wayland flags
-echo - Set background image in sddm theme
