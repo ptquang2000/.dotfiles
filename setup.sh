@@ -65,6 +65,7 @@ sudo ln -sf $(pwd)/sddm.conf.d /etc/
 echo Cleaning up
 rm -rf ./where-is-my-sddm-theme
 rm -rf ./yay
+rm -rf ${HOME}/.bash*
 
 echo Create directories
 mkdir -p ~/Downloads/ ~/Pictures/
