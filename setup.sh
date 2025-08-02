@@ -49,11 +49,6 @@ chsh -s /usr/bin/zsh
 echo Setting default apps
 xdg-mime default org.pwmt.zathura.desktop application/pdf
 
-echo Start services
-systemctl enable reflector.service
-systemctl start reflector.service
-systemctl --user enable --now waybar.service
-
 echo Setting sddm themes
 git clone https://github.com/ptquang2000/where-is-my-sddm-theme.git
 cd ./where-is-my-sddm-theme
@@ -72,3 +67,4 @@ mkdir -p ~/Downloads/ ~/Pictures/
 
 echo TODO:
 echo - Setup github SSH key
+echo - Enable services
