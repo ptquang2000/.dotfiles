@@ -1,7 +1,7 @@
 // -*- mode: jsonc -*-
 [{
     "output": ["HDMI-A-1"],
-    // "layer": "top", // Waybar at top layer
+    "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar position (top|bottom|left|right)
     "height": 24, // Waybar height (to be removed for auto height)
     // "width": 1280, // Waybar width
@@ -30,10 +30,10 @@
         "disable-scroll-wraparound": true,
         "format": "{icon}",
         "format-icons": {
-            "1": "",
-            "2": "",
-            "9": "",
-            "10": ""
+            //"1": "",
+            //"2": "",
+            //"9": "",
+            //"10": ""
         }
     },
     "hyprland/window": {
