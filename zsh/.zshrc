@@ -54,6 +54,7 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle -e ':autocomplete:*:*' list-lines 'reply=( $(( LINES / 3 )) )'
 
 alias clear='clear && history -p && printf "\e[3J"'
+alias vlcrand='~/.local/bin/vlcrand'
 
 if [ -f $HOME/.zshrc ]; then
    source $HOME/.zshrc
