@@ -55,6 +55,7 @@ zstyle -e ':autocomplete:*:*' list-lines 'reply=( $(( LINES / 3 )) )'
 
 alias clear='clear && history -p && printf "\e[3J"'
 alias vlcrand='~/.local/bin/vlcrand'
+alias mvrand='~/.local/bin/mvrand'
 
 if [ -f $HOME/.zshrc ]; then
    source $HOME/.zshrc
