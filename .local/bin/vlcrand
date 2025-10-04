@@ -1,26 +1,23 @@
 #!/usr/bin/env bash
 # Usage: ./playrand <path> <file_pattern> [number]
-# Example: ./playrand ~/Music "*.mp3" 10
-# Example: ./playrand ~/Videos "*.mp4"
 
 set -euo pipefail
 
-if [ $# -lt 2 ]; then
+if [ $# -lt 1 ]; then
   echo "Usage: $0 <path> <file_pattern> [number]"
   exit 1
 fi
 
 path="$1"
-pattern="$2"
-number="${3:-}"   # optional
+number="${2:-}"   # optional
 
 if [[ -n "$number" ]]; then
-  find "$path" -type f -name "$pattern" \
+  find "$path" -type f -name "*.mp4" \
     | shuf \
     | head -n "$number" \
     | xargs -d '\n' vlc
 else
-  find "$path" -type f -name "$pattern" \
+  find "$path" -type f -name "*.mp4" \
     | shuf \
     | xargs -d '\n' vlc
 fi

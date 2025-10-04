@@ -1,27 +1,24 @@
 #!/usr/bin/env bash
 # Usage: ./mvrand <path> <file_pattern> <destination> [number]
-# Example: ./mvrand ~/Music "*.mp3" 10
-# Example: ./mvrand ~/Videos "*.mp4"
 
 set -euo pipefail
 
 if [ $# -lt 2 ]; then
-  echo "Usage: $0 <path> <file_pattern> <destination> [number]"
+  echo "Usage: $0 <path> <destination> [number]"
   exit 1
 fi
 
 path="$1"
-pattern="$2"
-dest="$3"
-number="${4:-}"   # optional
+dest="$2"
+number="${3:-}"   # optional
 
 if [[ -n "$number" ]]; then
-  find "$path" -type f -name "$pattern" \
+  find "$path" -type f -name "*.mp4" \
     | shuf \
     | head -n "$number" \
     | xargs -d '\n' mv -t "$dest"
 else
-  find "$path" -type f -name "$pattern" \
+  find "$path" -type f -name "*.mp4" \
     | shuf \
     | xargs -d '\n' mv -t "$dest"
 fi
