@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 config_path=${HOME}/.config
 local_path=${HOME}/.local
@@ -6,6 +6,9 @@ sddm_bg=./assets/wallpaper.jpg
 
 echo CONFIG_PATH=${config_path}
 echo local_path=${local_path}
+
+echo Updating submodules
+git submodule update --init --recursive
 
 echo Installing yay
 git clone https://aur.archlinux.org/yay.git
@@ -18,9 +21,6 @@ yay -Sy --noconfirm - < ./pacman_pkgs
 
 echo Doing yay install
 yay -Sy --noconfirm - < ./yay_pkgs
-
-echo Updating submodules
-git submodule update --init --recursive
 
 echo Creating symbolic links
 rm -rf ${HOME}/.zshenv
@@ -56,11 +56,13 @@ sudo sh install.sh
 cd -
 sudo cp ${sddm_bg} /usr/share/sddm/themes/where_is_my_sddm_theme
 sudo ln -sf $(pwd)/sddm.conf.d /etc/
+sudo sed -i 's|^background=.*|background=wallpaper.jpg|' /usr/share/sddm/themes/where_is_my_sddm_theme/theme.conf
 
 echo Cleaning up
 rm -rf ./where-is-my-sddm-theme
 rm -rf ./yay
 rm -rf ${HOME}/.bash*
+yay -R dolphin
 
 echo Create directories
 mkdir -p ~/Downloads/ ~/Pictures/
