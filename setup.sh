@@ -70,3 +70,7 @@ mkdir -p ~/Downloads/ ~/Pictures/
 echo TODO:
 echo - Setup github SSH key
 echo - Enable services
+echo systemctl enable reflector.service
+echo systemctl start reflector.service
+echo systemctl --user enable --now waybar.service
+

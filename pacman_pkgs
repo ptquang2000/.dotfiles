@@ -1,4 +1,3 @@
-base-devel
 bear
 bemenu-wayland
 clang
@@ -6,9 +5,7 @@ fcitx5-config-qt
 fcitx5-unikey
 fzf
 gimp
-git
 gnome-themes-extra
-grim
 gvfs
 hypridle
 hyprpaper
@@ -19,10 +16,7 @@ mupdf
 neovim
 noto-fonts-cjk
 noto-fonts-emoji
-qt6-5compat
-ripgrep
 reflector
-slurp
 thunar
 thunar-volman
 tmux
