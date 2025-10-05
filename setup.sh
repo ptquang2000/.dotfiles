@@ -27,8 +27,8 @@ rm -rf ${HOME}/.zshenv
 ln -sf $(pwd)/.zshenv ${HOME}
 rm -rf ${HOME}/hypr
 ln -sf $(pwd)/hypr ${config_path}
-rm -rf ${HOME}/kitty
-ln -sf $(pwd)/kitty ${config_path}
+rm -rf ${HOME}/ghostty
+ln -sf $(pwd)/ghostty ${config_path}
 rm -rf ${HOME}/nvim
 ln -sf $(pwd)/nvim ${config_path}
 rm -rf ${HOME}/tmux
@@ -62,7 +62,9 @@ echo Cleaning up
 rm -rf ./where-is-my-sddm-theme
 rm -rf ./yay
 rm -rf ${HOME}/.bash*
-yay -R dolphin
+yay -R dolphin kitty
+
+timedatectl set-timezone Asia/Bangkok
 
 echo Create directories
 mkdir -p ~/Downloads/ ~/Pictures/
