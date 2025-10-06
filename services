@@ -1,6 +1,12 @@
 #!/bin/bash
 
 echo Enable services
+
 systemctl enable --now systemd-resolved
+sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
 systemctl enable --now reflector.service
+
+timedatectl set-timezone Asia/Bangkok
+
 systemctl --user enable --now waybar.service

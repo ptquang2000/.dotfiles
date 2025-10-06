@@ -64,15 +64,11 @@ rm -rf ./yay
 rm -rf ${HOME}/.bash*
 yay -R dolphin kitty
 
-timedatectl set-timezone Asia/Bangkok
-
 echo Create directories
 mkdir -p ~/Downloads/ ~/Pictures/
 
 echo TODO:
 echo - Setup github SSH key
-echo - Enable services
-echo systemctl enable reflector.service
-echo systemctl start reflector.service
-echo systemctl --user enable --now waybar.service
+echo - Enable services (sh ./services)
+echo - If there is no sound from videos on x or fb, installing vlc-plugin-ffmpeg might help (https://bbs.archlinux.org/viewtopic.php?id=306853)
 
