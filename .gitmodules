@@ -17,3 +17,9 @@
 [submodule "zsh/agkozak-zsh-prompt"]
 	path = zsh/agkozak-zsh-prompt
 	url = https://github.com/agkozak/agkozak-zsh-prompt
+[submodule ".local/bin/tmux-sessionizer"]
+	path = .local/bin/tmux-sessionizer
+	url = https://github.com/ThePrimeagen/tmux-sessionizer.git
+[submodule "tmux-sessionizer"]
+	path = tmux-sessionizer
+	url = https://github.com/ThePrimeagen/tmux-sessionizer.git
