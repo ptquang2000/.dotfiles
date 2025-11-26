@@ -1,11 +1,10 @@
 # default apps
 export EDITOR="nvim"
-export TERM="kitty"
-export BROWSER="google-chrome"
+export TERM="ghostty"
+export BROWSER="zen-browser"
 
 # Adds ~/.local/bin and subfolders to $PATH
-export PATH="$PATH:${$(find ~/.local/bin -maxdepth 1 -type d -printf %p:)%%:}"
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$PATH:${$(find -L ${HOME}/.local/bin -maxdepth 1 -type d -printf %p:)%%:}"
 export PATH="$PATH:${HOME}/.cargo/bin"
 
 # cleaning up home folder
@@ -14,4 +13,3 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 export XDG_CACHE_HOME="$HOME/.cache"
 export ZDOTDIR="$HOME/.config/zsh"
-# . "$HOME/.cargo/env"

@@ -44,7 +44,7 @@ bindkey "^[[4~" 		end-of-line
 bindkey "^[[F"			end-of-line
 bindkey "^E" 			end-of-line
 
-bindkey -s "^f" 		"${HOME}/.dotfiles/.local/bin/tmux-sessionizer/tmux-sessionizer\n"
+bindkey -s "^f" 		"tmux-sessionizer\n"
 bindkey -r "^["
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
@@ -54,9 +54,11 @@ zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 zstyle -e ':autocomplete:*:*' list-lines 'reply=( $(( LINES / 3 )) )'
 
 alias clear='clear && history -p && printf "\e[3J"'
-alias vlcrand='~/.local/bin/vlcrand'
-alias mvrand='~/.local/bin/mvrand'
 
 if [ -f $HOME/.zshrc ]; then
    source $HOME/.zshrc
 fi
+
+#if [ -z "$TMUX" ]; then
+#	${HOME}/.local/bin/tmux-sessionizer/tmux-sessionizer ${HOME}
+#fi

@@ -1,5 +1,19 @@
 Archlinux initial setup
 
+# Github SSH key
+```bash
+ssh-keygen -t ed25519 -C "ptquang2000@gmail.com"
+eval "$(ssh-agent -s)"
+ssh-add ${HOME}/.ssh/id_ed25519
+cat ${HOME}/.ssh/id_ed25519.pub
+```
+
+# Git global config
+```bash
+git config --global user.email "ptquang2000@gmail.com"
+git config --global user.name "quang.phan"
+```
+
 # Update repo
 ```bash
 git submodule update --init --recursive
@@ -10,16 +24,18 @@ git submodule update --init --recursive
 pacman -S --noconfirm - < packages/pacman
 
 git clone https://aur.archlinux.org/yay.git
-cd yay
+# cd yay
 makepkg -si
 yay -S --noconfirm - < packages/yay
 
-cargo install - < packages/cargo
+cargo install `cat packages/cargo | awk '{printf "%s ",$0} END {print ""}'`
 ```
 
 # Custom config
 ```bash
 # Shell
+rm -rf ${HOME}/.bashrc
+ln -sf $(pwd)/.bashrc ${HOME}
 rm -rf ${HOME}/.zshenv
 ln -sf $(pwd)/.zshenv ${HOME}
 rm -rf ${HOME}/zsh
@@ -46,6 +62,8 @@ rm -rf ${HOME}/fcitx5
 ln -sf $(pwd)/fcitx5 ${HOME}/.config
 rm -rf ${HOME}/mpv
 ln -sf $(pwd)/mpv ${HOME}/.config
+rm -rf ${HOME}/moka
+ln -sf $(pwd)/moka ${HOME}/.config
 ```
 
 # Default apps
@@ -57,7 +75,7 @@ xdg-mime default org.pwmt.zathura.desktop application/pdf
 # sddm themes
 ```bash
 git clone https://github.com/ptquang2000/where-is-my-sddm-theme.git
-cd where-is-my-sddm-theme
+# cd where-is-my-sddm-theme
 sudo sh install.sh
 sudo cp $(pwd)/assets/wallpaper.jpg /usr/share/sddm/themes/where_is_my_sddm_theme
 sudo ln -sf $(pwd)/sddm.conf.d /etc/
@@ -77,20 +95,6 @@ yay -R - < packages/uninstall
 ```bash
 mkdir -p ${HOME}/Downloads
 mkdir -p ${HOME}/Pictures
-```
-
-# Github SSH key
-```bash
-ssh-keygen -t ed25519 -C "ptquang2000@gmail.com"
-eval "$(ssh-agent -s)"
-ssh-add ${HOME}/.ssh/id_ed25519
-cat ${HOME}/.ssh/id_ed25519.pub
-```
-
-# Git global config
-```bash
-git config --global user.email "ptquang2000@gmail.com"
-git config --global user.name "quang.phan"
 ```
 
 # Enable services
