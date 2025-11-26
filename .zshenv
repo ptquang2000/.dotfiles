@@ -1,8 +1,3 @@
-# default apps
-export EDITOR="nvim"
-export TERM="ghostty"
-export BROWSER="zen-browser"
-
 # Adds ~/.local/bin and subfolders to $PATH
 export PATH="$PATH:${$(find -L ${HOME}/.local/bin -maxdepth 1 -type d -printf %p:)%%:}"
 export PATH="$PATH:${HOME}/.cargo/bin"
