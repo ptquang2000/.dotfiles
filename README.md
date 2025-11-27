@@ -99,7 +99,10 @@ mkdir -p ${HOME}/Pictures
 
 # Enable services
 ```bash
+# slow boot
 systemctl enable --now reflector.service
+# use this instead
+systemctl enable --now reflector.timer
 
 timedatectl set-timezone Asia/Bangkok
 
