@@ -3,6 +3,7 @@ bear
 bemenu-wayland
 clang
 fcitx5-unikey
+fd
 fzf
 ghostty
 gnome-themes-extra
@@ -22,14 +23,19 @@ noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
 qt5-wayland
+qt6-5compat
 qt6-wayland
 reflector
+ripgrep
 rust
+seatd
+sddm
 slurp
 tmux
 ttf-cascadia-code-nerd
 unzip
 waybar
+wget
 xdg-desktop-portal-hyprland
 zathura
 zathura-pdf-mupdf

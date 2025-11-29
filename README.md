@@ -21,12 +21,12 @@ git submodule update --init --recursive
 
 # Install packages
 ```bash
-pacman -S --noconfirm - < packages/pacman
+sudo pacman -S --noconfirm --needed - < packages/pacman
 
 git clone https://aur.archlinux.org/yay.git
 # cd yay
 makepkg -si
-yay -S --noconfirm - < packages/yay
+yay -S --noconfirm --needed - < packages/yay
 
 cargo install `cat packages/cargo | awk '{printf "%s ",$0} END {print ""}'`
 ```
@@ -34,28 +34,28 @@ cargo install `cat packages/cargo | awk '{printf "%s ",$0} END {print ""}'`
 # Custom config
 ```bash
 # Shell
+rm -rf ${local_path}/bin
+ln -sf $(pwd)/.local/bin ${HOME}/.local
 rm -rf ${HOME}/.bashrc
 ln -sf $(pwd)/.bashrc ${HOME}
 rm -rf ${HOME}/.zshenv
 ln -sf $(pwd)/.zshenv ${HOME}
 rm -rf ${HOME}/zsh
 ln -sf $(pwd)/zsh ${HOME}/.config
-rm -rf ${HOME}/ghostty
-ln -sf $(pwd)/ghostty ${HOME}/.config
-rm -rf ${local_path}/bin
-ln -sf $(pwd)/.local/bin ${HOME}/.local
 rm -rf ${HOME}/tmux
 ln -sf $(pwd)/tmux ${HOME}/.config
 rm -rf ${HOME}/tmux-sessionizer
 ln -sf $(pwd)/tmux-sessionizer ${HOME}/.config
 rm -rf ${HOME}/nvim-init
-ln -sf $(pwd)/nvim-init ${HOME}/.config
+ln -sf $(pwd)/nvim-init ${HOME}/.config/nvim
 
 # Hyprland
 rm -rf ${HOME}/hypr
 ln -sf $(pwd)/hypr ${HOME}/.config
 
 # Applications
+rm -rf ${HOME}/ghostty
+ln -sf $(pwd)/ghostty ${HOME}/.config
 rm -rf ${HOME}/waybar
 ln -sf $(pwd)/waybar ${HOME}/.config
 rm -rf ${HOME}/zathura
@@ -96,11 +96,13 @@ yay -R - < packages/uninstall
 # Create directories
 ```bash
 mkdir -p ${HOME}/Downloads
-mkdir -p ${HOME}/Pictures
+mkdir -p ${HOME}/Pictures/Screenshots
 ```
 
 # Enable services
 ```bash
+sudo systemctl enable sddm
+
 # slow boot
 systemctl enable --now reflector.service
 # use this instead
