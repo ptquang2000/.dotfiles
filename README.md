@@ -46,6 +46,8 @@ rm -rf ${local_path}/bin
 ln -sf $(pwd)/.local/bin ${HOME}/.local
 rm -rf ${HOME}/tmux
 ln -sf $(pwd)/tmux ${HOME}/.config
+rm -rf ${HOME}/tmux-sessionizer
+ln -sf $(pwd)/tmux-sessionizer ${HOME}/.config
 rm -rf ${HOME}/nvim-init
 ln -sf $(pwd)/nvim-init ${HOME}/.config
 
@@ -62,8 +64,8 @@ rm -rf ${HOME}/fcitx5
 ln -sf $(pwd)/fcitx5 ${HOME}/.config
 rm -rf ${HOME}/mpv
 ln -sf $(pwd)/mpv ${HOME}/.config
-rm -rf ${HOME}/moka
-ln -sf $(pwd)/moka ${HOME}/.config
+rm -rf ${HOME}/mako
+ln -sf $(pwd)/mako ${HOME}/.config
 ```
 
 # Default apps
