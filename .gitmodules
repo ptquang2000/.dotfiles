@@ -24,4 +24,4 @@
 	url = https://github.com/po5/thumbfast.git
 [submodule "nvim-init"]
 	path = nvim-init
-	url = git@github.com:ptquang2000/nvim-init.git
+	url = https://github.com/ptquang2000/nvim-init.git
