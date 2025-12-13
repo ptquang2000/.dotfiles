@@ -4,3 +4,6 @@ kitty
 kitty-shell-integration
 kitty-terminfo
 wofi
+seatd
+qt6-5compat
+sddm
