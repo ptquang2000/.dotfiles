@@ -48,6 +48,13 @@ bindkey -s "^f" 		"tmux-sessionizer\n"
 bindkey -r "^["
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+#
+# Ghostty integration
+if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
+  # change zsh autosuggestion color so it's not invisible
+  ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#818386'
+  source "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
+fi
 
 zstyle ':completion:*' menuselect
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'

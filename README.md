@@ -114,6 +114,14 @@ systemctl --user enable --now waybar.service
 
 systemctl enable --now systemd-resolved
 sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
+# default login user
+sudo EDITOR=/usr/bin/nvim systemctl edit getty@tty1
+# Add
+# [Service]
+# ExecStart=
+# ExecStart=-/sbin/agetty -n -o username %I
+systemctl enable getty@tty1
 ```
 
 # TODO:
