@@ -48,10 +48,9 @@ bindkey -s "^f" 		"tmux-sessionizer\n"
 bindkey -r "^["
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
-#
+
 # Ghostty integration
 if [[ -n $GHOSTTY_RESOURCES_DIR ]]; then
-  # change zsh autosuggestion color so it's not invisible
   ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=#818386'
   source "$GHOSTTY_RESOURCES_DIR"/shell-integration/zsh/ghostty-integration
 fi
@@ -66,6 +65,9 @@ if [ -f $HOME/.zshrc ]; then
    source $HOME/.zshrc
 fi
 
-#if [ -z "$TMUX" ]; then
-#	${HOME}/.local/bin/tmux-sessionizer/tmux-sessionizer ${HOME}
-#fi
+if [ -z "$TMUX" ]; then
+	${HOME}/.local/bin/tmux-sessionizer/tmux-sessionizer ${HOME}
+fi
+
+# opencode
+export PATH=/home/clovolc/.opencode/bin:$PATH
