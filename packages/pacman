@@ -28,6 +28,8 @@ qt6-wayland
 reflector
 ripgrep
 rust
+seatd
+sddm
 slurp
 tmux
 ttf-cascadia-code-nerd
