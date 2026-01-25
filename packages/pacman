@@ -23,6 +23,7 @@ noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
 qt5-wayland
+qt6-5compat
 qt6-wayland
 reflector
 ripgrep
