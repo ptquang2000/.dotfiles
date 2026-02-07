@@ -93,12 +93,6 @@ rm -rf ${HOME}/.bash*
 yay -R - < packages/uninstall
 ```
 
-# Create directories
-```bash
-mkdir -p ${HOME}/Downloads
-mkdir -p ${HOME}/Pictures/Screenshots
-```
-
 # Enable services
 ```bash
 sudo systemctl enable sddm
@@ -106,10 +100,11 @@ sudo systemctl enable sddm
 # slow boot
 systemctl enable --now reflector.service
 # use this instead
-systemctl enable --now reflector.timer
+sudo systemctl enable --now reflector.timer
 
-timedatectl set-timezone Asia/Bangkok
+sudo timedatectl set-timezone Asia/Bangkok
 
+# require graphical-session???
 systemctl --user enable --now waybar.service
 
 systemctl enable --now systemd-resolved
@@ -122,6 +117,14 @@ sudo EDITOR=/usr/bin/nvim systemctl edit getty@tty1
 # ExecStart=
 # ExecStart=-/sbin/agetty -n -o username %I
 systemctl enable getty@tty1
+
+# waydroid setup
+sudo waydroid init -s GAPPS
+sudo systemctl enable --now waydroid-container.service
+sudo waydroid-extras install libndk 
+sudo waydroid-extras install libhoudini
+# after my browser is accessible
+sudo waydroid-extras certified
 ```
 
 # TODO:
