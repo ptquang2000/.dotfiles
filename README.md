@@ -34,7 +34,7 @@ cargo install `cat packages/cargo | awk '{printf "%s ",$0} END {print ""}'`
 # Custom config
 ```bash
 # Shell
-rm -rf ${local_path}/bin
+rm -rf ${HOME}/.local/bin
 ln -sf $(pwd)/.local/bin ${HOME}/.local
 rm -rf ${HOME}/.bashrc
 ln -sf $(pwd)/.bashrc ${HOME}
