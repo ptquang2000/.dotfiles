@@ -1,3 +1,4 @@
+aria2
 bc
 bear
 bemenu-wayland
@@ -19,6 +20,7 @@ less
 libdvdcss
 libnotify
 mako
+mpv
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
@@ -32,6 +34,10 @@ rust
 seatd
 sddm
 slurp
+texlive-basic
+texlive-binextra
+texlive-latex
+texlive-latexextra
 tmux
 ttf-cascadia-code-nerd
 unzip
