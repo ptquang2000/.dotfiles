@@ -65,9 +65,5 @@ if [ -f $HOME/.zshrc ]; then
    source $HOME/.zshrc
 fi
 
-if [ -z "$TMUX" ]; then
-	${HOME}/.local/bin/tmux-sessionizer/tmux-sessionizer ${HOME}
-fi
-
 # opencode
 export PATH=/home/clovolc/.opencode/bin:$PATH
