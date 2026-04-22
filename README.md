@@ -1,6 +1,12 @@
-Archlinux initial setup
+# Dotfiles
 
-# Github SSH key
+Personal dotfiles and initial-setup recipes for my Arch Linux (primary) and
+Windows workstations. The same repository drives both platforms — only the
+bootstrap scripts differ.
+
+# Prerequisites
+
+## Github SSH key
 ```bash
 ssh-keygen -t ed25519 -C "ptquang2000@gmail.com"
 eval "$(ssh-agent -s)"
@@ -8,84 +14,85 @@ ssh-add ${HOME}/.ssh/id_ed25519
 cat ${HOME}/.ssh/id_ed25519.pub
 ```
 
-# Git global config
+## Git global config
 ```bash
 git config --global user.email "ptquang2000@gmail.com"
 git config --global user.name "quang.phan"
 ```
 
-# Update repo
+## Clone and update submodules
 ```bash
 git submodule update --init --recursive
 ```
 
-# Install packages
-```bash
-sudo pacman -S --noconfirm --needed - < packages/pacman
+# Usage
 
-git clone https://aur.archlinux.org/yay.git
-# cd yay
-makepkg -si
-yay -S --noconfirm --needed - < packages/yay
+Both platforms are driven from this same repository; only the bootstrap
+scripts differ. Run the **install** script first (system packages), then the
+**setup** script (symlinks into user-config locations).
 
-cargo install `cat packages/cargo | awk '{printf "%s ",$0} END {print ""}'`
+## Windows
+
+Requires PowerShell 5.1+. No administrator privileges needed — Scoop is
+installed per-user and `setup.bat` uses directory junctions (`mklink /j`).
+
+```batch
+:: 1. Install Scoop and every package declared in packages\scoop.json
+install.bat
+
+:: 2. Link powershell\, nvim-init\, and psmux\ into their expected
+::    Windows locations (Documents\PowerShell, %LOCALAPPDATA%\nvim,
+::    %HOMEPATH%\.config\psmux).
+setup.bat
 ```
 
-# Custom config
+## Linux
+
+Primary target is **Arch Linux** (and Arch-based distros: CachyOS,
+EndeavourOS, Manjaro, Artix). **Debian / Ubuntu** (and derivatives: Mint,
+Pop!_OS, Raspbian) are supported on a best-effort basis — Arch-specific
+packages such as `hyprland`, `ghostty`, `fcitx5-unikey`, and `waydroid` are
+not available in the apt repositories and will be reported as failures in
+the install summary.
+
 ```bash
-# Shell
-rm -rf ${HOME}/.local/bin
-ln -sf $(pwd)/.local/bin ${HOME}/.local
-rm -rf ${HOME}/.bashrc
-ln -sf $(pwd)/.bashrc ${HOME}
-rm -rf ${HOME}/.zshenv
-ln -sf $(pwd)/.zshenv ${HOME}
-rm -rf ${HOME}/zsh
-ln -sf $(pwd)/zsh ${HOME}/.config
-rm -rf ${HOME}/tmux
-ln -sf $(pwd)/tmux ${HOME}/.config
-rm -rf ${HOME}/tmux-sessionizer
-ln -sf $(pwd)/tmux-sessionizer ${HOME}/.config
-rm -rf ${HOME}/nvim-init
-ln -sf $(pwd)/nvim-init ${HOME}/.config/nvim
+# Make the scripts executable (first time only)
+chmod +x install.sh setup.sh
 
-# Hyprland
-rm -rf ${HOME}/hypr
-ln -sf $(pwd)/hypr ${HOME}/.config
+# 1. Install system packages: pacman + AUR (via yay; bootstrapped if
+#    missing) + cargo crates on Arch, or apt best-effort on Debian/Ubuntu.
+#    Requires sudo.
+./install.sh
 
-# Applications
-rm -rf ${HOME}/ghostty
-ln -sf $(pwd)/ghostty ${HOME}/.config
-rm -rf ${HOME}/waybar
-ln -sf $(pwd)/waybar ${HOME}/.config
-rm -rf ${HOME}/zathura
-ln -sf $(pwd)/zathura ${HOME}/.config
-rm -rf ${HOME}/fcitx5
-ln -sf $(pwd)/fcitx5 ${HOME}/.config
-rm -rf ${HOME}/mpv
-ln -sf $(pwd)/mpv ${HOME}/.config
-rm -rf ${HOME}/mako
-ln -sf $(pwd)/mako ${HOME}/.config
+# 2. Preview what setup.sh would link (no filesystem changes)
+./setup.sh --dry-run
+
+# 3. Link configs into ~/.config, $HOME, and /etc (sudo prompted for
+#    /etc/sddm.conf.d and /etc/systemd/resolved.conf.d). Idempotent: safe
+#    to re-run. Any pre-existing non-symlink targets are backed up to
+#    <path>.bak.<timestamp> before being replaced.
+./setup.sh
 ```
 
-# Default apps
+# Post-install (Linux)
+
+## Default apps
 ```bash
 chsh -s /usr/bin/zsh
 xdg-mime default org.pwmt.zathura.desktop application/pdf
 ```
 
-# sddm themes
+## sddm theme
 ```bash
 git clone https://github.com/ptquang2000/where-is-my-sddm-theme.git
 # cd where-is-my-sddm-theme
 sudo sh install.sh
 sudo cp $(pwd)/assets/wallpaper.jpg /usr/share/sddm/themes/where_is_my_sddm_theme
-sudo ln -sf $(pwd)/sddm.conf.d /etc/
 #sudo sed -i 's|^background=.*|background=wallpaper.jpg|' /usr/share/sddm/themes/where_is_my_sddm_theme/theme.conf
 ```
+`setup.sh` already links `sddm.conf.d/` into `/etc/`.
 
-
-# Cleaning up
+## Cleaning up
 ```bash
 rm -rf where-is-my-sddm-theme
 rm -rf yay
@@ -93,7 +100,7 @@ rm -rf ${HOME}/.bash*
 yay -R - < packages/uninstall
 ```
 
-# Enable services
+## Enable services
 ```bash
 sudo systemctl enable sddm
 
@@ -121,11 +128,11 @@ systemctl enable getty@tty1
 # waydroid setup
 sudo waydroid init -s GAPPS
 sudo systemctl enable --now waydroid-container.service
-sudo waydroid-extras install libndk 
+sudo waydroid-extras install libndk
 sudo waydroid-extras install libhoudini
 # after my browser is accessible
 sudo waydroid-extras certified
 ```
 
-# TODO:
+# TODO
 - If there is no sound from videos on x or fb, installing vlc-plugin-ffmpeg might help (https://bbs.archlinux.org/viewtopic.php?id=306853)
