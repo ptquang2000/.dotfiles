@@ -27,4 +27,4 @@
 	url = https://github.com/ptquang2000/nvim-init.git
 [submodule "powershell"]
 	path = powershell
-	url = git@github.com:ptquang2000/powershell.git
+	url = https://github.com/ptquang2000/powershell.git

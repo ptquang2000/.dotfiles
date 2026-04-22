@@ -28,22 +28,64 @@ git submodule update --init --recursive
 # Usage
 
 Both platforms are driven from this same repository; only the bootstrap
-scripts differ. Run the **install** script first (system packages), then the
-**setup** script (symlinks into user-config locations).
+scripts differ. On Windows, run **setup** first (prerequisites + symlinks),
+then **install** (packages). On Linux, run **install** first (system
+packages), then **setup** (symlinks into user-config locations).
 
 ## Windows
 
-Requires PowerShell 5.1+. No administrator privileges needed — Scoop is
-installed per-user and `setup.bat` uses directory junctions (`mklink /j`).
+Requires PowerShell 5.1+. **No administrator privileges needed** for either
+script — Scoop is installed per-user and `setup.ps1` uses directory
+junctions (no symlink privilege required).
 
-```batch
-:: 1. Install Scoop and every package declared in packages\scoop.json
-install.bat
+**Fresh machine (one-liner):**
 
-:: 2. Link powershell\, nvim-init\, and psmux\ into their expected
-::    Windows locations (Documents\PowerShell, %LOCALAPPDATA%\nvim,
-::    %HOMEPATH%\.config\psmux).
-setup.bat
+Downloads and runs `setup.ps1` directly from GitHub, which installs Scoop +
+git and then recursively clones this repository into `%USERPROFILE%\.dotfiles`
+before linking configs. **No administrator privileges needed.**
+
+```powershell
+irm https://raw.githubusercontent.com/ptquang2000/.dotfiles/master/setup.ps1 | iex
+```
+
+If script execution is blocked by policy, use a one-shot bypass (still no
+admin required):
+
+```powershell
+powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/ptquang2000/.dotfiles/master/setup.ps1 | iex"
+```
+
+After `setup.ps1` finishes, `cd` into the cloned repo and run `install.ps1`
+to install packages:
+
+```powershell
+cd $env:USERPROFILE\.dotfiles
+.\install.ps1
+```
+
+**If the repo is already cloned:**
+
+```powershell
+# 1. Install Scoop + git, and link powershell\, nvim-init\, and psmux\ into
+#    their expected Windows locations (Documents\PowerShell,
+#    %LOCALAPPDATA%\nvim, %USERPROFILE%\.config\psmux).
+.\setup.ps1
+
+# 2. Install every package declared in packages\scoop.json (via `scoop import`).
+.\install.ps1
+```
+
+If script execution is blocked by policy, either allow it once per user:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+or invoke each script with a one-shot bypass (no admin, no persistent change):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup.ps1
+powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
 ## Linux
