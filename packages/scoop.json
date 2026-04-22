@@ -2,6 +2,7 @@
   "buckets": [
     { "Name": "main",   "Source": "https://github.com/ScoopInstaller/Main" },
     { "Name": "extras", "Source": "https://github.com/ScoopInstaller/Extras" },
+    { "Name": "versions", "Source": "https://github.com/ScoopInstaller/Versions" },
     { "Name": "personal", "Source": "https://github.com/ptquang2000/.dotfiles" }
   ],
   "apps": [
@@ -24,9 +25,13 @@
     { "Name": "winflexbison",     "Source": "main",   "Version": "2.5.5" },
     { "Name": "copilot-cli",      "Source": "main" },
     { "Name": "gh",               "Source": "main" },
-    { "Name": "oh-my-posh",       "Source": "main" },
+    { "Name": "oh-my-posh",				"Source": "main" },
     { "Name": "psmux",						"Source": "main" },
     { "Name": "clink",						"Source": "main" },
-    { "Name": "unikey",						"Source": "personal" }
+    { "Name": "unikey",						"Source": "personal" },
+		{ "Name": "python",						"Source": "main" },
+    { "Name": "rustup",						"Source": "main" },
+    { "Name": "go",								"Source": "main" },
+    { "Name": "python27",					"Source": "versions" }
   ]
 }
