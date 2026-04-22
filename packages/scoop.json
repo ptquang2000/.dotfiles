@@ -1,0 +1,32 @@
+{
+  "buckets": [
+    { "Name": "main",   "Source": "https://github.com/ScoopInstaller/Main" },
+    { "Name": "extras", "Source": "https://github.com/ScoopInstaller/Extras" },
+    { "Name": "personal", "Source": "https://github.com/ptquang2000/.dotfiles" }
+  ],
+  "apps": [
+    { "Name": "ant",              "Source": "main",   "Version": "1.10.9" },
+    { "Name": "aria2",            "Source": "main" },
+    { "Name": "llvm",             "Source": "main" },
+    { "Name": "cmake",            "Source": "main",   "Version": "3.24.0-rc3" },
+    { "Name": "sqlitebrowser",    "Source": "extras" },
+    { "Name": "docker",           "Source": "main" },
+    { "Name": "fd",               "Source": "main" },
+    { "Name": "ffmpeg",           "Source": "main" },
+    { "Name": "fzf",              "Source": "main" },
+    { "Name": "jom",              "Source": "main" },
+    { "Name": "jq",               "Source": "main" },
+    { "Name": "nodejs",           "Source": "main" },
+    { "Name": "neovim",           "Source": "main" },
+    { "Name": "pwsh",             "Source": "main" },
+    { "Name": "ripgrep",          "Source": "main" },
+    { "Name": "tree-sitter",      "Source": "main" },
+    { "Name": "winflexbison",     "Source": "main",   "Version": "2.5.5" },
+    { "Name": "copilot-cli",      "Source": "main" },
+    { "Name": "gh",               "Source": "main" },
+    { "Name": "oh-my-posh",       "Source": "main" },
+    { "Name": "psmux",						"Source": "main" },
+    { "Name": "clink",						"Source": "main" },
+    { "Name": "unikey",						"Source": "personal" }
+  ]
+}
