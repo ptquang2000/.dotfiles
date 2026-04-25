@@ -3,6 +3,7 @@
     { "Name": "main",   "Source": "https://github.com/ScoopInstaller/Main" },
     { "Name": "extras", "Source": "https://github.com/ScoopInstaller/Extras" },
     { "Name": "versions", "Source": "https://github.com/ScoopInstaller/Versions" },
+    { "Name": "java", "Source": "https://github.com/ScoopInstaller/Java" },
     { "Name": "personal", "Source": "https://github.com/ptquang2000/.dotfiles" }
   ],
   "apps": [
@@ -32,6 +33,10 @@
 		{ "Name": "python",						"Source": "main" },
     { "Name": "rustup",						"Source": "main" },
     { "Name": "go",								"Source": "main" },
-    { "Name": "python27",					"Source": "versions" }
+    { "Name": "python27",					"Source": "versions" },
+    { "Name": "openjdk21",				"Source": "java" },
+    { "Name": "7zip",							"Source": "main" },
+    { "Name": "ninja",						"Source": "main" },
+    { "Name": "dotnet-sdk",				"Source": "main" }
   ]
 }
