@@ -1,42 +1,151 @@
 {
-  "buckets": [
-    { "Name": "main",   "Source": "https://github.com/ScoopInstaller/Main" },
-    { "Name": "extras", "Source": "https://github.com/ScoopInstaller/Extras" },
-    { "Name": "versions", "Source": "https://github.com/ScoopInstaller/Versions" },
-    { "Name": "java", "Source": "https://github.com/ScoopInstaller/Java" },
-    { "Name": "personal", "Source": "https://github.com/ptquang2000/.dotfiles" }
-  ],
-  "apps": [
-    { "Name": "ant",              "Source": "main",   "Version": "1.10.9" },
-    { "Name": "aria2",            "Source": "main" },
-    { "Name": "llvm",             "Source": "main" },
-    { "Name": "cmake",            "Source": "main",   "Version": "3.24.0-rc3" },
-    { "Name": "sqlitebrowser",    "Source": "extras" },
-    { "Name": "docker",           "Source": "main" },
-    { "Name": "fd",               "Source": "main" },
-    { "Name": "ffmpeg",           "Source": "main" },
-    { "Name": "fzf",              "Source": "main" },
-    { "Name": "jom",              "Source": "main" },
-    { "Name": "jq",               "Source": "main" },
-    { "Name": "nodejs",           "Source": "main" },
-    { "Name": "neovim",           "Source": "main" },
-    { "Name": "pwsh",             "Source": "main" },
-    { "Name": "ripgrep",          "Source": "main" },
-    { "Name": "tree-sitter",      "Source": "main" },
-    { "Name": "winflexbison",     "Source": "main",   "Version": "2.5.5" },
-    { "Name": "copilot-cli",      "Source": "main" },
-    { "Name": "gh",               "Source": "main" },
-    { "Name": "oh-my-posh",				"Source": "main" },
-    { "Name": "psmux",						"Source": "main" },
-    { "Name": "clink",						"Source": "main" },
-    { "Name": "unikey",						"Source": "personal" },
-		{ "Name": "python",						"Source": "main" },
-    { "Name": "rustup",						"Source": "main" },
-    { "Name": "go",								"Source": "main" },
-    { "Name": "python27",					"Source": "versions" },
-    { "Name": "openjdk21",				"Source": "java" },
-    { "Name": "7zip",							"Source": "main" },
-    { "Name": "ninja",						"Source": "main" },
-    { "Name": "dotnet-sdk",				"Source": "main" }
-  ]
+    "buckets": [
+        {
+            "Name": "main",
+            "Source": "https://github.com/ScoopInstaller/Main"
+        },
+        {
+            "Name": "extras",
+            "Source": "https://github.com/ScoopInstaller/Extras"
+        },
+        {
+            "Name": "versions",
+            "Source": "https://github.com/ScoopInstaller/Versions"
+        },
+        {
+            "Name": "java",
+            "Source": "https://github.com/ScoopInstaller/Java"
+        },
+        {
+            "Name": "personal",
+            "Source": "https://github.com/ptquang2000/.dotfiles"
+        }
+    ],
+    "apps": [
+        {
+            "Name": "aria2",
+            "Source": "main"
+        },
+        {
+            "Name": "llvm",
+            "Source": "main"
+        },
+        {
+            "Name": "cmake",
+            "Source": "main",
+            "Version": "3.24.0-rc3"
+        },
+        {
+            "Name": "sqlitebrowser",
+            "Source": "extras"
+        },
+        {
+            "Name": "docker",
+            "Source": "main"
+        },
+        {
+            "Name": "fd",
+            "Source": "main"
+        },
+        {
+            "Name": "ffmpeg",
+            "Source": "main"
+        },
+        {
+            "Name": "fzf",
+            "Source": "main"
+        },
+        {
+            "Name": "jq",
+            "Source": "main"
+        },
+        {
+            "Name": "nodejs",
+            "Source": "main"
+        },
+        {
+            "Name": "neovim",
+            "Source": "main"
+        },
+        {
+            "Name": "pwsh",
+            "Source": "main"
+        },
+        {
+            "Name": "ripgrep",
+            "Source": "main"
+        },
+        {
+            "Name": "tree-sitter",
+            "Source": "main"
+        },
+        {
+            "Name": "copilot-cli",
+            "Source": "main"
+        },
+        {
+            "Name": "gh",
+            "Source": "main"
+        },
+        {
+            "Name": "oh-my-posh",
+            "Source": "main"
+        },
+        {
+            "Name": "psmux",
+            "Source": "main"
+        },
+        {
+            "Name": "clink",
+            "Source": "main"
+        },
+        {
+            "Name": "unikey",
+            "Source": "personal"
+        },
+        {
+            "Name": "python",
+            "Source": "main"
+        },
+        {
+            "Name": "rustup",
+            "Source": "main"
+        },
+        {
+            "Name": "go",
+            "Source": "main"
+        },
+        {
+            "Name": "python27",
+            "Source": "versions"
+        },
+        {
+            "Name": "openjdk21",
+            "Source": "java"
+        },
+        {
+            "Name": "7zip",
+            "Source": "main"
+        },
+        {
+            "Name": "ninja",
+            "Source": "main"
+        },
+        {
+            "Name": "dotnet-sdk",
+            "Source": "main"
+        },
+        {
+            "Name": "zen-browser",
+            "Source": "extras"
+        },
+        {
+            "Name": "notepadplusplus",
+            "Source": "extras"
+        },
+        {
+            "Name": "msbuild-extractor-sample",
+            "Source": "personal"
+        }
+    ]
 }

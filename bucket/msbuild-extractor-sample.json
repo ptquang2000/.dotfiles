@@ -1,0 +1,7 @@
+{
+  "version": "0.1.0",
+  "url": "https://github.com/microsoft/msbuild-extractor-sample/releases/download/v0.1.0/msbuild-extractor-sample-v0.1.0-win-x64.zip",
+  "hash": "c090147cc5e1cd2b0d4686077d3549489a91e5283635d629de8163eb51c0c94f",
+  "bin": "msbuild-extractor-sample.exe"
+}
+
