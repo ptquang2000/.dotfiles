@@ -158,8 +158,9 @@ Write-Section "Link dotfiles"
 $documents = [Environment]::GetFolderPath('MyDocuments')
 $junctions = @(
     @{ Source = Join-Path $ScriptRoot 'powershell'; Target = Join-Path $documents       'PowerShell' }
-    @{ Source = Join-Path $ScriptRoot 'nvim-init';  Target = Join-Path $env:LOCALAPPDATA 'nvim'       }
-    @{ Source = Join-Path $ScriptRoot 'psmux';      Target = Join-Path $env:USERPROFILE  '.config\psmux' }
+    @{ Source = Join-Path $ScriptRoot 'nvim-init';  Target = Join-Path $env:LOCALAPPDATA 'nvim'	}
+    @{ Source = Join-Path $ScriptRoot 'nvim-init/clangd';  Target = Join-Path $env:LOCALAPPDATA 'clangd' }
+    @{ Source = Join-Path $ScriptRoot 'psmux';      Target = Join-Path $env:USERPROFILE  '.config\psmux'	}
 )
 foreach ($j in $junctions) {
     New-DotfilesJunction -Source $j.Source -Target $j.Target
