@@ -90,20 +90,18 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 
 ## Linux
 
-Primary target is **Arch Linux** (and Arch-based distros: CachyOS,
-EndeavourOS, Manjaro, Artix). **Debian / Ubuntu** (and derivatives: Mint,
-Pop!_OS, Raspbian) are supported on a best-effort basis — Arch-specific
-packages such as `hyprland`, `ghostty`, `fcitx5-unikey`, and `waydroid` are
-not available in the apt repositories and will be reported as failures in
-the install summary.
+Arch Linux only. This repo is for personal use, so there is no distro
+detection, no AUR-helper selection, and no fallback for other
+distributions — `install.sh` assumes pacman + yay.
 
 ```bash
 # Make the scripts executable (first time only)
 chmod +x install.sh setup.sh
 
-# 1. Install system packages: pacman + AUR (via yay; bootstrapped if
-#    missing) + cargo crates on Arch, or apt best-effort on Debian/Ubuntu.
-#    Requires sudo.
+# 1. Install system packages (pacman + AUR via yay + cargo crates),
+#    install the SDDM theme, configure default apps (zsh shell, zathura
+#    for PDFs), and run waydroid post-install (init GAPPS, enable
+#    container, install libndk + libhoudini). Requires sudo.
 ./install.sh
 
 # 2. Preview what setup.sh would link (no filesystem changes)
@@ -118,34 +116,8 @@ chmod +x install.sh setup.sh
 
 # Post-install (Linux)
 
-## Default apps
-```bash
-chsh -s /usr/bin/zsh
-xdg-mime default org.pwmt.zathura.desktop application/pdf
-```
-
-## sddm theme
-```bash
-git clone https://github.com/ptquang2000/where-is-my-sddm-theme.git
-# cd where-is-my-sddm-theme
-sudo sh install.sh
-sudo cp $(pwd)/assets/wallpaper.jpg /usr/share/sddm/themes/where_is_my_sddm_theme
-#sudo sed -i 's|^background=.*|background=wallpaper.jpg|' /usr/share/sddm/themes/where_is_my_sddm_theme/theme.conf
-```
-`setup.sh` already links `sddm.conf.d/` into `/etc/`.
-
-## Cleaning up
-```bash
-rm -rf where-is-my-sddm-theme
-rm -rf yay
-rm -rf ${HOME}/.bash*
-yay -R - < packages/uninstall
-```
-
 ## Enable services
 ```bash
-sudo systemctl enable sddm
-
 # slow boot
 systemctl enable --now reflector.service
 # use this instead
@@ -166,13 +138,16 @@ sudo EDITOR=/usr/bin/nvim systemctl edit getty@tty1
 # ExecStart=
 # ExecStart=-/sbin/agetty -n -o username %I
 systemctl enable getty@tty1
+```
 
-# waydroid setup
-sudo waydroid init -s GAPPS
-sudo systemctl enable --now waydroid-container.service
-sudo waydroid-extras install libndk
-sudo waydroid-extras install libhoudini
-# after my browser is accessible
+## Manual steps
+
+The only step `install.sh` cannot automate is the waydroid certification,
+which requires a Google Services Framework ID retrieved through a browser
+running inside the waydroid session. After launching waydroid and
+signing in via a browser, run:
+
+```bash
 sudo waydroid-extras certified
 ```
 

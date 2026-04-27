@@ -24,10 +24,6 @@ DRY_RUN=0
 for arg in "$@"; do
     case "$arg" in
         --dry-run|-n) DRY_RUN=1 ;;
-        -h|--help)
-            sed -n '2,16p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
-            exit 0
-            ;;
         *)
             echo "Unknown argument: $arg" >&2
             exit 2
@@ -150,12 +146,8 @@ link_into "$SCRIPT_DIR/.local/bin"        "$HOME/.local/bin"               ".loc
 # Note: symlinking a directory from $HOME into /etc works but is fragile when
 # the repo moves. We still use ln -sfn (matching the README) so edits in the
 # repo take effect immediately; users who prefer copies can adjust manually.
-if [[ -d "$SCRIPT_DIR/sddm.conf.d" ]]; then
-    link_into "$SCRIPT_DIR/sddm.conf.d"     "/etc/sddm.conf.d"             "sddm.conf.d (sudo)"
-fi
-if [[ -d "$SCRIPT_DIR/resolved.conf.d" ]]; then
-    link_into "$SCRIPT_DIR/resolved.conf.d" "/etc/systemd/resolved.conf.d" "resolved.conf.d (sudo)"
-fi
+link_into "$SCRIPT_DIR/sddm.conf.d"     "/etc/sddm.conf.d"             "sddm.conf.d (sudo)"
+link_into "$SCRIPT_DIR/resolved.conf.d" "/etc/systemd/resolved.conf.d" "resolved.conf.d (sudo)"
 
 # ---- summary ----------------------------------------------------------------
 
