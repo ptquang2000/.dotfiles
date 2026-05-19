@@ -146,6 +146,10 @@
         {
             "Name": "msbuild-extractor-sample",
             "Source": "personal"
+        },
+				{
+            "Name": "claude-code",
+            "Source": "main"
         }
     ]
 }
