@@ -2,7 +2,7 @@
 $ErrorActionPreference = 'Stop'
 
 $ScriptRoot = $PSScriptRoot
-if (-not $ScriptRoot) { $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path }
+if (-not $ScriptRoot -and $MyInvocation.MyCommand.Path) { $ScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path }
 
 function Write-Section {
     param([string]$Message)
