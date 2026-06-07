@@ -33,6 +33,8 @@ PKG_DIR="${SCRIPT_DIR}/packages"
 PACMAN_FILE="${PKG_DIR}/pacman"
 AUR_FILE="${PKG_DIR}/yay"
 CARGO_FILE="${PKG_DIR}/cargo"
+NPM_FILE="${PKG_DIR}/package.json"
+PIP_FILE="${PKG_DIR}/requirements.txt"
 
 SDDM_THEME_DIR="/usr/share/sddm/themes/where_is_my_sddm_theme"
 SDDM_THEME_REPO="https://github.com/ptquang2000/where-is-my-sddm-theme.git"
@@ -120,6 +122,36 @@ install_cargo_crates() {
     done
 }
 
+install_npm_packages() {
+    [[ -r "$NPM_FILE" ]] || return 0
+    if ! need_cmd npm; then
+        warn "npm not found; skipping npm packages."
+        return 0
+    fi
+    log "Installing npm packages from $NPM_FILE"
+    local deps
+    deps=$(node -e "const p=require('$NPM_FILE'); console.log(Object.keys(p.dependencies||{}).join(' '))")
+    [[ -n "$deps" ]] && as_root npm install -g $deps
+    ok "npm packages installed."
+}
+
+install_pip_packages() {
+    [[ -r "$PIP_FILE" ]] || return 0
+    if ! need_cmd pipx; then
+        warn "pipx not found; skipping pip packages."
+        return 0
+    fi
+    log "Installing pip packages from $PIP_FILE"
+    local pkgs
+    mapfile -t pkgs < <(read_pkg_file "$PIP_FILE")
+    [[ ${#pkgs[@]} -gt 0 ]] || return 0
+    local pkg
+    for pkg in "${pkgs[@]}"; do
+        pipx install "$pkg" || pipx upgrade "$pkg"
+    done
+    ok "pip packages installed."
+}
+
 # --- default apps ------------------------------------------------------
 configure_default_apps() {
     log "Configuring default applications"
@@ -185,6 +217,8 @@ main() {
     bootstrap_yay
     install_arch_aur
     install_cargo_crates
+    install_npm_packages
+    install_pip_packages
     configure_default_apps
     install_sddm_theme
     setup_waydroid

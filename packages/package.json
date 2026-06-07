@@ -1,0 +1,7 @@
+{
+  "name": "dotfiles-packages",
+  "description": "npm packages for dotfiles",
+  "dependencies": {
+    "pyright": "^1.1.300"
+  }
+}

@@ -137,10 +137,19 @@ link_into "$SCRIPT_DIR/zsh"               "$CONFIG_HOME/zsh"               "zsh"
 link_into "$SCRIPT_DIR/tmux"              "$CONFIG_HOME/tmux"              "tmux"
 link_into "$SCRIPT_DIR/tmux-sessionizer"  "$CONFIG_HOME/tmux-sessionizer"  "tmux-sessionizer"
 
+# --- ~/.local/bin item symlinks --------------------------------------------
+LOCAL_SRC="${SCRIPT_DIR}/.local/bin"
+LOCAL_DEST="${HOME}/.local/bin"
+if [[ -d "$LOCAL_SRC" ]]; then
+    for item in "$LOCAL_SRC"/*; do
+        [[ -e "$item" ]] || continue
+        link_into "$item" "${LOCAL_DEST}/$(basename "$item")" ".local/bin/$(basename "$item")"
+    done
+fi
+
 # --- $HOME dotfiles ----------------------------------------------------------
 link_into "$SCRIPT_DIR/.zshenv"           "$HOME/.zshenv"                  ".zshenv"
 link_into "$SCRIPT_DIR/.bashrc"           "$HOME/.bashrc"                  ".bashrc"
-link_into "$SCRIPT_DIR/.local/bin"        "$HOME/.local/bin"               ".local/bin"
 
 # --- system paths (require sudo) --------------------------------------------
 # Note: symlinking a directory from $HOME into /etc works but is fragile when
