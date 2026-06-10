@@ -116,6 +116,7 @@ link_into() {
 #   zen/             Browser profile data — user-specific, don't auto-link
 #   assets/          Static assets consumed by other steps, not a config dir
 #   packages/        Package lists consumed by install.sh, not a config dir
+#   opencode/        Contains opencode skills (linked individually below)
 #   .git/ .gitignore .gitmodules install.bat setup.bat install.sh setup.sh README.md
 
 CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
@@ -136,6 +137,7 @@ link_into "$SCRIPT_DIR/nvim-init"         "$CONFIG_HOME/nvim"              "nvim
 link_into "$SCRIPT_DIR/zsh"               "$CONFIG_HOME/zsh"               "zsh"
 link_into "$SCRIPT_DIR/tmux"              "$CONFIG_HOME/tmux"              "tmux"
 link_into "$SCRIPT_DIR/tmux-sessionizer"  "$CONFIG_HOME/tmux-sessionizer"  "tmux-sessionizer"
+link_into "$SCRIPT_DIR/opencode/skills"   "$CONFIG_HOME/opencode/skills"   "opencode/skills"
 
 # --- ~/.local/bin item symlinks --------------------------------------------
 LOCAL_SRC="${SCRIPT_DIR}/.local/bin"
