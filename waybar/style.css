@@ -1,100 +1,168 @@
+/*
+██╗    ██╗ █████╗ ██╗   ██╗██████╗  █████╗ ██████╗ 
+██║    ██║██╔══██╗╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗
+██║ █╗ ██║███████║ ╚████╔╝ ██████╔╝███████║██████╔╝
+██║███╗██║██╔══██║  ╚██╔╝  ██╔══██╗██╔══██║██╔══██╗
+╚███╔███╔╝██║  ██║   ██║   ██████╔╝██║  ██║██║  ██║
+ ╚══╝╚══╝ ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+                          A style for simple waybar
+*/
+
+@import "themes/main.css";
+
 * {
-    border: none;
-    border-radius: 0;
-    font-size: 15px;
-    min-height: 0;
+  font-family: CaskaydiaCove Nerd Font Mono Medium;
+  font-size: 13px;
+  font-feature-settings: '"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"';
+  min-height: 24px;
+  padding: 0px 5px 0px 5px;
 }
 
 window#waybar {
-    font-family: FontAwesome, "Symbols Nerd Font", "CaskaydiaCove Nerd Font", monospace;
-    background: transparent;
-    color: white;
+  background-color: @bg;
+}
+
+window#waybar.empty #window {
+  background-color: transparent;
 }
 
 #window {
-    font-weight: bold;
-    font-family: "CaskaydiaCove Nerd Font";
+  background-color: transparent;
+  color: @fg_soft;
+  margin: 0px 2px 0px 2px;
 }
-/*
-#workspaces {
-    padding: 0 5px;
+
+tooltip * {
+  background-color: @tooltip_bg;
+  padding: 2px 3px 2px 3px;
+  border-radius: 6px;
+  color: @fg;
 }
-*/
 
 #workspaces button {
-    padding: 0 5px;
-    background: transparent;
-    color: white;
-    border-top: 2px solid transparent;
+  background: transparent;
+  border-radius: 0px;
+  color: @workspace_inactive;
+  padding: 0px;
+  margin: 0px;
+}
+
+#workspaces button.active {
+  background: transparent;
+  border-radius: 0px;
+  color: @fg_alt;
+  padding: 0px;
+  margin: 0px;
 }
 
 #workspaces button.focused {
-    color: #c9545d;
-    border-top: 2px solid #c9545d;
+  background-color: @workspace_active;
 }
 
-#mode {
-    background: #64727D;
-    border-bottom: 3px solid white;
+#workspaces button.urgent {
+  color: @urgent;
 }
 
-#idle_inhibitor, #clock, #battery, #cpu, #memory, #network, #pulseaudio, #custom-spotify, #tray, #mode {
-    padding: 0 3px;
-    margin: 0 2px;
+#custom-logo {
+  background-color: @bg_alt;
+  font-family: CaskaydiaCove Nerd Font Mono Medium;
+  font-size: 21px;
+  color: @fg;
+  padding: 0px 0px 0px 0px;
 }
 
-#clock {
-    font-weight: bold;
-}
-
-#battery {
-}
-
-#battery icon {
-    color: red;
-}
-
-#battery.charging {
-}
-
-@keyframes blink {
-    to {
-        background-color: #ffffff;
-        color: black;
-    }
-}
-
-#battery.warning:not(.charging) {
-    color: white;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
+#custom-expand {
+  background-color: @bg_alt;
+  color: @fg;
+  padding: 0px 4px 0px 4px;
 }
 
 #cpu {
+  border-radius: 20px;
+  background-color: transparent;
+  color: @fg;
+  padding: 0px 8px 0px 0px;
+  margin: 0px 0px 0px 2px;
 }
 
 #memory {
+  background-color: transparent;
+  color: @fg;
+  padding: 0px 5px 0px 5px;
 }
 
-#network {
+#disk {
+  background-color: transparent;
+  color: @fg;
+  padding: 0px 5px 0px 0px;
 }
 
-#network.disconnected {
-    background: #f53c3c;
+#temperature {
+  background-color: transparent;
+  color: @fg;
+  padding: 0px 5px 0px 0px;
+}
+
+#battery {
+  background-color: @bg_alt;
+  color: @fg;
+  padding: 0px 0px 0px 5px;
+  margin: 0px 0px 0px 4px;
+}
+
+#battery.charging {
+  background-color: @bg_alt;
+  color: @fg;
+  padding: 0px 10px 0px 5px;
+}
+
+#battery.plugged {
+  background-color: @bg_alt;
+  color: @fg;
+  padding: 0px 10px 0px 5px;
+}
+
+#language {
+  background-color: transparent;
+  color: @fg;
+  padding: 0px 5px 0px 5px;
+  margin: 0px 6px 0px 0px;
+}
+
+#backlight {
+  border-radius: 0px 0px 0px 10px;
+  background-color: @bg_alt;
+  color: @fg;
+  padding: 0px 5px 0px 10px;
+  margin: 0px 0px 0px 4px;
 }
 
 #pulseaudio {
+  background-color: @bg_alt;
+  color: @fg;
+  padding: 0px 5px 0px 5px;
 }
 
-#pulseaudio.muted {
+#clock {
+  background-color: transparent;
+  color: @fg;
+  padding: 0px 8px 0px 8px;
+  margin: 0px 0px 0px 5px;
 }
 
-#custom-spotify {
-    color: rgb(102, 220, 105);
+#workspaces button:hover {
+  background: @workspace_hover;
 }
 
-#tray {
+#custom-logo:hover,
+#clock:hover,
+#custom-expand:hover,
+#language:hover {
+  background: @hover;
+}
+
+#backlight:hover,
+#pulseaudio:hover,
+#network:hover {
+  color: @fg_soft;
 }

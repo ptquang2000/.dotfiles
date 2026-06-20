@@ -113,7 +113,6 @@ link_into() {
 #   powershell/      Windows PowerShell profile (handled by setup.bat)
 #   bucket/          Scoop bucket metadata (Windows-only)
 #   psmux/           PowerShell tmux clone (Windows-only)
-#   zen/             Browser profile data — user-specific, don't auto-link
 #   assets/          Static assets consumed by other steps, not a config dir
 #   packages/        Package lists consumed by install.sh, not a config dir
 #   opencode/        Contains opencode skills (linked individually below)
@@ -158,7 +157,6 @@ link_into "$SCRIPT_DIR/.bashrc"           "$HOME/.bashrc"                  ".bas
 # the repo moves. We still use ln -sfn (matching the README) so edits in the
 # repo take effect immediately; users who prefer copies can adjust manually.
 link_into "$SCRIPT_DIR/sddm.conf.d"     "/etc/sddm.conf.d"             "sddm.conf.d (sudo)"
-link_into "$SCRIPT_DIR/resolved.conf.d" "/etc/systemd/resolved.conf.d" "resolved.conf.d (sudo)"
 
 # ---- summary ----------------------------------------------------------------
 

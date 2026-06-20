@@ -1,97 +1,158 @@
-// -*- mode: jsonc -*-
-[{
-    "output": ["HDMI-A-1"],
-    "layer": "top", // Waybar at top layer
-    "height": 24, // Waybar height (to be removed for auto height)
-    "spacing": 4, // Gaps between modules (4px)
-    "modules-left": [
-        "hyprland/workspaces",
-        "cava",
-        "hyprland/submap",
-    ],
-    "modules-center": [
-        "hyprland/window"
-    ],
-    "modules-right": [
-        "mpris",
-        "network",
-        "clock",
-        "tray"
-    ],
-    "hyprland/workspaces": {
-        "all-outputs": true,
-        "warp-on-scroll": false,
-        "enable-bar-scroll": true,
-        "disable-scroll-wraparound": true,
-        "format": "{icon}",
-        "format-icons": {
-            //"1": "",
-            //"2": "",
-            //"9": "",
-            //"10": ""
-        }
-    },
+//
+// ██╗    ██╗ █████╗ ██╗   ██╗██████╗  █████╗ ██████╗ 
+// ██║    ██║██╔══██╗╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗
+// ██║ █╗ ██║███████║ ╚████╔╝ ██████╔╝███████║██████╔╝
+// ██║███╗██║██╔══██║  ╚██╔╝  ██╔══██╗██╔══██║██╔══██╗
+// ╚███╔███╔╝██║  ██║   ██║   ██████╔╝██║  ██║██║  ██║
+//  ╚══╝╚══╝ ╚═╝  ╚═╝   ╚═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
+//                          A config for simple waybar
+
+{
+  "layer": "top",
+  "position": "top",
+  "modules-left": ["custom/logo", "hyprland/window"],
+  "modules-center": ["hyprland/workspaces"],
+  "modules-right": ["group/expand", "hyprland/language", "tray", "pulseaudio#mic", "pulseaudio#source", "clock"],
+  "reload_style_on_change": true,
+
+
     "hyprland/window": {
-        "format": "{title}",
-        "max-length": 120,
-        "all-outputs": true
+      "format": "<b>{class}</b>  {title}",
+      "icon": false,
+      "max-length": 40,
+      "separate-outputs": true,
+      "tooltip": false
     },
-    "mpris": {
-        "format": " {status_icon} {dynamic}",
-        "interval": 1,
-        "dynamic-len": 40,
-        "status-icons": {
-            "playing": "▶",
-            "paused": "⏸",
-            "stopped": ""
-        },
-        "dynamic-order": ["title", "artist"],
-        "ignored-players": ["firefox"]
+
+    "hyprland/workspaces": {
+      "format": "{icon}",
+      "tooltip": false,
+      "all-outputs": true,
+      "sort-by-number": true,
+      "disable-scroll": false,
+      "on-scroll-up": "hyprctl dispatch workspace +1",
+      "on-scroll-down": "hyprctl dispatch workspace -1",
+      "active-only": false
     },
-    "idle_inhibitor": {
-        "format": "{icon}",
-        "format-icons": {
-            "activated": "",
-            "deactivated": ""
-        }
+
+
+    "custom/logo": {
+      "format": "󰭟",
+      "tooltip": true,
+      "tooltip-format": "Power Options",
+      "on-click": "wlogout"
     },
-    "hyprland/submap": {
-        "format": "{}"
-    },
-    "sway/scratchpad": {
-        "format": "{icon} {count}",
-        "show-empty": false,
-        "format-icons": ["", ""],
-        "tooltip": true,
-        "tooltip-format": "{app}: {title}"
-    },
-    "tray": {
-        "icon-size": 14,
-        "spacing": 10
-    },
-    "load": {
-        "format": "  {}"
-    },
+
     "clock": {
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-	"today-format": "<span color='#ffffff'>{}</span>",
-        "format": "{:%H:%M}",
-	"calendar": {
-            "format": {
-                "today": "<span color='#ffffff'><b><u>{}</u></b></span>"
-                }
+      "tooltip": true,
+      "tooltip-format": "{:%A, %B %d %Y}\n<tt><small>{calendar}</small></tt>",
+      "format": "{:%a %b %d  %I:%M %p}",
+      "on-click": "makoctl restore",
+      "calendar": {
+        "format": {
+          "today": "<span color='#ffffff'><b><u>{}</u></b></span>"
         }
+      }
     },
+ 
+    "tray": {
+      "format": "{icon}",
+      "tooltip": true,
+      "icon-size": 12,
+      "spacing": 0
+    },
+
+    "backlight": {
+      "device": "intel_backlight",
+      "format": "{icon}",
+      "format-icons": ["󰖨"],
+      "scroll-step": 5,
+      "tooltip": true,
+      "tooltip-format": "Brightness: {percent}%"
+    },
+
+    "pulseaudio#source": {
+      "format": "{icon}",
+      "format-muted": "󰝟",
+      "tooltip": true,
+      "tooltip-format": "Volume: {volume}%",
+      "format-icons": {
+        "headphone": "",
+        "default": ["", "", ""]
+      },
+      "scroll-step": 5,
+      "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    },
+
+    "pulseaudio#mic": {
+      "format": "{format_source}",
+      "format-source-muted": "",
+      "format-source": "<span foreground='red'><sup></sup></span>",
+      "on-click": "pactl set-source-mute 0 toggle",
+      "tooltip": true,
+      "tooltip-format": "Microphone Status"
+    },
+
+    "battery": {
+      "bat": "BAT0",
+      "format": "<span font_size='small'>{capacity}% {icon}</span>",
+      "format-charging": "󱐋",
+      "format-plugged": "󱐋",
+      "format-icons": {
+        "default": ["<span color='red'></span>", "<span color='orange'></span>", "", "", ""]
+      },
+      "format-full": "󰂄",
+      "tooltip": true,
+      "tooltip-format": "Battery: {capacity}%\n{time}",
+      "interval": 4
+    },
+
+   "group/expand": {
+      "orientation": "horizontal",
+      "drawer": {
+        "transition-duration": 600,
+        "transition-to-left": true,
+        "click-to-reveal": true
+      },
+      "modules": ["custom/expand", "memory", "temperature", "disk", "cpu"]
+    },
+
+    "custom/expand": {
+      "format": "",
+      "tooltip": false
+    },
+
     "cpu": {
-        "format": "{usage}% ",
-        "tooltip": false
+	    "interval": 4,
+	    "format": "{icon0}{icon1}{icon2}{icon3}",
+	    "format-icons": ["▁", "▂", "▃", "▄", "▅", "▆", "<span color='#589df6'>▇</span>", "<span color='orange'>█</span>"]
     },
+
     "memory": {
-        "format": "{}% "
+      "format": "{used:0.1f}G",
+      "tooltip": true,
+      "tooltip-format": "RAM: Used {used:0.1f}G / Free {total:0.1f}G",
+      "interval": 4
     },
-    "network": {
-        "format-wifi": "{essid} ({signalStrength}%)",
-        "format-ethernet": " {ifname}: {ipaddr}/{cidr} ",
-        "format-disconnected": "Disconnected ⚠ "
+
+    "disk": {
+      "interval": 30,
+      "unit": "GB",
+      "format": "{specific_used:0.2f}G",
+      "path": "/",
+      "tooltip": true,
+      "tooltip-format": "Root: Used {specific_used:0.2f}G / free {specific_free:0.2f}G"
+    },
+
+    "temperature": {
+      // "thermal-zone": 2,
+      // "hwmon-path": ["/sys/class/hwmon/hwmon2/temp1_input", "/sys/class/thermal/thermal_zone0/temp"],
+      "critical-threshold": 80,
+      "format-critical": "<span color='orange'>{temperatureC}~C</span>",
+      "format": "<span color='#589df6'>{temperatureC}~C</span>",
+      "tooltip": true,
+      "tooltip-format": "Temperature: {temperatureC}°C",
+      "interval": 4
     }
-}]
+
+} 

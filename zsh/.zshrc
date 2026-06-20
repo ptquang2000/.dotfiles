@@ -22,7 +22,7 @@ source ~/.config/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh
 source ~/.config/zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh
 source ~/.config/zsh/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
 source ~/.config/zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-source ~/.config/zsh/agkozak-zsh-prompt/agkozak-zsh-prompt.plugin.zsh
+source ~/.config/zsh/themes/minimal.zsh-theme
 
 bindkey "^[[A"			history-substring-search-up
 bindkey "^[[B" 			history-substring-search-down
@@ -66,4 +66,4 @@ if [ -f $HOME/.zshrc ]; then
 fi
 
 # opencode
-export PATH=/home/clovolc/.opencode/bin:$PATH
+export PATH=$HOME/.opencode/bin:$PATH
