@@ -132,6 +132,22 @@ systemctl enable --now systemd-resolved
 sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
 
+## systemd-boot — dual boot with Windows
+
+If Windows is installed on a **separate EFI System Partition** from Linux,
+systemd-boot's auto-detected "Windows Boot Manager" entry often fails to boot
+because it does not pass the BCD (Boot Configuration Database) path to the
+Windows bootloader.
+
+A helper script is included in this repo:
+
+```bash
+# Copy bootmgfw.efi + BCD to the systemd-boot ESP and create a loader entry
+sudo ./bin/add-windows-entry
+```
+
+Reboot — a **Windows** entry will appear in the systemd-boot menu.
+
 ## Manual steps
 
 The only step `install.sh` cannot automate is the waydroid certification,

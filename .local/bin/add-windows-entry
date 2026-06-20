@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# add-windows-entry — Add a Windows Boot Manager entry to systemd-boot
+#
+# Detects the Linux ESP (where systemd-boot lives) and the Windows EFI
+# bootloader.  If they are on different partitions the script copies
+# bootmgfw.efi + BCD to the Linux ESP so bootmgfw.efi can find its config.
+#
+# Usage
+#   sudo ./bin/add-windows-entry
+#
+# The entry is written to:
+#   $ESP/loader/entries/windows.conf
+
+ENTRIES_DIR=
+ESP=
+WIN_ESP=
+WIN_BOOT_DIR=
+
+# ---------------------------------------------------------------- detect
+
+detect_esp() {
+  # systemd-boot entries live under $ESP/loader/entries/
+  # The ESP is typically /boot or /boot/EFI.
+  for d in /boot/loader/entries /boot/EFI/loader/entries; do
+    if [[ -d "$d" ]]; then
+      ENTRIES_DIR="$d"
+      ESP="${d%/loader/entries}"
+      return 0
+    fi
+  done
+  echo "ERROR: cannot find systemd-boot entries directory" >&2
+  exit 1
+}
+
+detect_windows() {
+  # Look for bootmgfw.efi — first on the Linux ESP (shared ESP),
+  # then on a separate partition mounted under $ESP.
+  if [[ -f "$ESP/EFI/Microsoft/Boot/bootmgfw.efi" ]]; then
+    WIN_ESP="$ESP"
+    WIN_BOOT_DIR="$ESP/EFI/Microsoft/Boot"
+    return 0
+  fi
+
+  # Windows may have its own ESP mounted under the Linux ESP
+  # (e.g. /boot/EFI is a separate partition).
+  local candidate
+  for candidate in /boot/EFI /boot/EFI/EFI; do
+    if [[ -f "$candidate/EFI/Microsoft/Boot/bootmgfw.efi" ]]; then
+      WIN_ESP="$candidate"
+      WIN_BOOT_DIR="$candidate/EFI/Microsoft/Boot"
+      return 0
+    fi
+  done
+
+  # Fallback: search all mounted vfat partitions
+  local mountpoint
+  while IFS= read -r mountpoint; do
+    [[ -z "$mountpoint" ]] && continue
+    if [[ -f "$mountpoint/EFI/Microsoft/Boot/bootmgfw.efi" ]]; then
+      WIN_ESP="$mountpoint"
+      WIN_BOOT_DIR="$mountpoint/EFI/Microsoft/Boot"
+      return 0
+    fi
+  done < <(findmnt -t vfat -o TARGET --noheadings 2>/dev/null)
+
+  echo "ERROR: cannot find Windows EFI boot files" >&2
+  exit 1
+}
+
+# -------------------------------------------------------------- install
+
+copy_files() {
+  local dest="$ESP/EFI/Microsoft/Boot"
+  mkdir -p "$dest"
+
+  # If the Windows ESP is mounted *under* the Linux ESP, unmount it
+  # temporarily so the copy lands on the Linux ESP, not on Windows.
+  local needs_remount=0
+  if [[ "$WIN_ESP" != "$ESP" ]] && [[ "$WIN_ESP" == "$ESP"/* ]]; then
+    umount "$WIN_ESP" 2>/dev/null || true
+    needs_remount=1
+  fi
+
+  cp "$WIN_BOOT_DIR/bootmgfw.efi" "$dest/bootmgfw.efi"
+  cp "$WIN_BOOT_DIR/BCD"          "$dest/BCD"
+  cp "$WIN_BOOT_DIR/BCD.LOG"      "$dest/" 2>/dev/null || true
+  cp "$WIN_BOOT_DIR/boot.stl"     "$dest/" 2>/dev/null || true
+  cp "$WIN_BOOT_DIR/BOOTSTAT.DAT" "$dest/" 2>/dev/null || true
+
+  echo "  → copied boot files to $dest"
+
+  if (( needs_remount )); then
+    mount "$WIN_ESP" 2>/dev/null || true
+  fi
+}
+
+write_entry() {
+  # Path relative to the ESP root
+  local rel="EFI/Microsoft/Boot/bootmgfw.efi"
+  cat > "$ENTRIES_DIR/windows.conf" <<EOF
+title   Windows
+efi     $rel
+EOF
+  echo "  → wrote $ENTRIES_DIR/windows.conf"
+}
+
+# ----------------------------------------------------------------------
+
+echo ":: Detecting ESP …"
+detect_esp
+echo "  → ESP:        $ESP"
+echo "  → entries:    $ENTRIES_DIR"
+
+echo ":: Detecting Windows boot files …"
+detect_windows
+echo "  → Windows on: $WIN_ESP"
+
+if [[ "$WIN_ESP" == "$ESP" ]]; then
+  echo ":: Windows shares the same ESP — only creating entry"
+else
+  echo ":: Windows has a separate ESP — copying boot files"
+  copy_files
+fi
+
+if [[ -f "$ENTRIES_DIR/windows.conf" ]]; then
+  echo ":: Entry already exists, overwriting"
+fi
+write_entry
+
+echo ""
+echo "Done. Reboot and select \"Windows\" from the systemd-boot menu."
