@@ -12,7 +12,6 @@ MNML_BGJOB_MODE=${MNML_BGJOB_MODE:-4}
 [ "${+MNML_RPROMPT}" -eq 0 ] && MNML_RPROMPT=('mnml_cwd 2 0' mnml_git)
 [ "${+MNML_INFOLN}" -eq 0 ] && MNML_INFOLN=(mnml_err mnml_jobs mnml_uhp mnml_files)
 
-[ "${+MNML_MAGICENTER}" -eq 0 ] && MNML_MAGICENTER=(mnml_me_dirs mnml_me_ls mnml_me_git)
 
 
 # Components
@@ -178,29 +177,6 @@ function mnml_files {
     printf '%b' "$output"
 }
 
-# Magic enter functions
-function mnml_me_dirs {
-    local _w="\e[0m"
-    local _g="\e[38;5;244m"
-
-    if [ "$(dirs -p | sed -n '$=')" -gt 1 ]; then
-        local stack="$(dirs)"
-        echo "$_g${stack//\//$_w/$_g}$_w"
-    fi
-}
-
-function mnml_me_ls {
-    if [ "$(uname)" = "Darwin" ] && ! ls --version &> /dev/null; then
-        COLUMNS=$COLUMNS CLICOLOR_FORCE=1 ls -C -G -F
-    else
-        env ls -C -F --color="always" -w $COLUMNS
-    fi
-}
-
-function mnml_me_git {
-    git -c color.status=always status -sb 2> /dev/null
-}
-
 # Wrappers & utils
 # join outpus of components
 function _mnml_wrap {
@@ -223,21 +199,6 @@ function _mnml_iline {
     echo "${(%)1}"
 }
 
-# display magic enter
-function _mnml_me {
-    local -a output
-    output=()
-    local cmd_out=""
-    local cmd
-    for cmd in $MNML_MAGICENTER; do
-        cmd_out="$(eval "$cmd")"
-        if [ -n "$cmd_out" ]; then
-            output+="$cmd_out"
-        fi
-    done
-    printf '%b' "${(j:\n:)output}" | less -XFR
-}
-
 # capture exit status and reset prompt
 function _mnml_zle-line-init {
     MNML_LAST_ERR="$?" # I need to capture this ASAP
@@ -249,24 +210,13 @@ function _mnml_zle-keymap-select {
     zle reset-prompt
 }
 
-# draw infoline if no command is given
-function _mnml_buffer-empty {
-    if [ -z "$BUFFER" ]; then
-        _mnml_iline "$(_mnml_wrap MNML_INFOLN)"
-        _mnml_me
-        zle redisplay
-    else
-        zle accept-line
-    fi
-}
-
 # properly bind widgets
 # see: https://github.com/zsh-users/zsh-syntax-highlighting/blob/1f1e629290773bd6f9673f364303219d6da11129/zsh-syntax-highlighting.zsh#L292-L356
 function _mnml_bind_widgets() {
     zmodload zsh/zleparameter
 
     local -a to_bind
-    to_bind=(zle-line-init zle-keymap-select buffer-empty)
+    to_bind=(zle-line-init zle-keymap-select)
 
     typeset -F SECONDS
     local zle_wprefix=s$SECONDS-r$RANDOM
@@ -296,5 +246,3 @@ RPROMPT='$(_mnml_wrap MNML_RPROMPT)'
 
 _mnml_bind_widgets
 
-bindkey -M main  "^M" buffer-empty
-bindkey -M vicmd "^M" buffer-empty
