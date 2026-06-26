@@ -132,6 +132,7 @@ link_into "$SCRIPT_DIR/fcitx5"            "$CONFIG_HOME/fcitx5"            "fcit
 link_into "$SCRIPT_DIR/ghostty"           "$CONFIG_HOME/ghostty"           "ghostty"
 link_into "$SCRIPT_DIR/mpv"               "$CONFIG_HOME/mpv"               "mpv"
 link_into "$SCRIPT_DIR/zathura"           "$CONFIG_HOME/zathura"           "zathura"
+link_into "$SCRIPT_DIR/sioyek"           "$CONFIG_HOME/sioyek"            "sioyek"
 link_into "$SCRIPT_DIR/nvim-init"         "$CONFIG_HOME/nvim"              "nvim"
 link_into "$SCRIPT_DIR/zsh"               "$CONFIG_HOME/zsh"               "zsh"
 link_into "$SCRIPT_DIR/tmux"              "$CONFIG_HOME/tmux"              "tmux"
