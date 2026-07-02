@@ -88,10 +88,6 @@
             "Source": "main"
         },
         {
-            "Name": "oh-my-posh",
-            "Source": "main"
-        },
-        {
             "Name": "psmux",
             "Source": "main"
         },
@@ -147,7 +143,7 @@
             "Name": "msbuild-extractor-sample",
             "Source": "personal"
         },
-	{
+				{
             "Name": "claude-code",
             "Source": "main"
         }
