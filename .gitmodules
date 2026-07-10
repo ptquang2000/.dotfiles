@@ -28,3 +28,6 @@
 [submodule "powershell"]
 	path = powershell
 	url = https://github.com/ptquang2000/powershell.git
+[submodule "opencode/skills/mattpocock"]
+	path = opencode/skills/mattpocock
+	url = https://github.com/mattpocock/skills.git
