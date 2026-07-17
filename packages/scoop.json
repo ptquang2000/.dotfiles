@@ -19,6 +19,10 @@
         {
             "Name": "personal",
             "Source": "https://github.com/ptquang2000/.dotfiles"
+        },
+        {
+            "Name": "nerd-fonts",
+            "Source": "https://github.com/matthewjberger/scoop-nerd-fonts"
         }
     ],
     "apps": [
@@ -34,10 +38,6 @@
             "Name": "cmake",
             "Source": "main",
             "Version": "3.24.0-rc3"
-        },
-        {
-            "Name": "sqlitebrowser",
-            "Source": "extras"
         },
         {
             "Name": "docker",
@@ -80,10 +80,6 @@
             "Source": "main"
         },
         {
-            "Name": "copilot-cli",
-            "Source": "main"
-        },
-        {
             "Name": "gh",
             "Source": "main"
         },
@@ -112,12 +108,12 @@
             "Source": "main"
         },
         {
-            "Name": "python27",
-            "Source": "versions"
-        },
-        {
             "Name": "openjdk21",
             "Source": "java"
+        },
+        {
+            "Name": "opencode",
+            "Source": "main"
         },
         {
             "Name": "7zip",
@@ -143,9 +139,13 @@
             "Name": "msbuild-extractor-sample",
             "Source": "personal"
         },
-				{
-            "Name": "claude-code",
-            "Source": "main"
+        {
+            "Name": "sioyek",
+            "Source": "extras"
+        },
+        {
+            "Name": "Cascadia-Code",
+            "Source": "nerd-fonts"
         }
     ]
 }
