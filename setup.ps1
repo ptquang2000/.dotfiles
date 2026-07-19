@@ -160,11 +160,13 @@ $junctions = @(
     @{ Source = Join-Path $ScriptRoot 'powershell'; Target = Join-Path $documents       'PowerShell' }
     @{ Source = Join-Path $ScriptRoot 'nvim-init';  Target = Join-Path $env:LOCALAPPDATA 'nvim'	}
     @{ Source = Join-Path $ScriptRoot 'psmux';      Target = Join-Path $env:USERPROFILE  '.config\psmux'	}
-    @{ Source = Join-Path $ScriptRoot 'sioyek';     Target = Join-Path $env:LOCALAPPDATA 'sioyek'	}
 )
 foreach ($j in $junctions) {
     New-DotfilesJunction -Source $j.Source -Target $j.Target
 }
+
+# sioyek (scoop portable build) reads config from its own install dir — hardlink our files in.
+'prefs_user.config', 'keys_user.config' | ForEach-Object { New-Item -ItemType HardLink -Force -Path (Join-Path (scoop prefix sioyek) $_) -Value (Join-Path $ScriptRoot "sioyek\$_") | Out-Null }
 
 Write-Host ""
 Write-Host "Setup complete." -ForegroundColor Green
