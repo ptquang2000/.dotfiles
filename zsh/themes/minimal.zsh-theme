@@ -2,7 +2,7 @@
 MNML_OK_COLOR="${MNML_OK_COLOR:-2}"
 MNML_ERR_COLOR="${MNML_ERR_COLOR:-1}"
 
-MNML_USER_CHAR="${MNML_USER_CHAR:-󰭟}"
+MNML_USER_CHAR="${MNML_USER_CHAR:- 󰭟}"
 MNML_INSERT_CHAR="${MNML_INSERT_CHAR:- }"
 MNML_NORMAL_CHAR="${MNML_NORMAL_CHAR:-·}"
 MNML_ELLIPSIS_CHAR="${MNML_ELLIPSIS_CHAR:-..}"
@@ -241,7 +241,7 @@ function _mnml_bind_widgets() {
 autoload -U colors && colors
 setopt prompt_subst
 
-PROMPT='$(_mnml_wrap MNML_PROMPT) '
+PROMPT='$(_mnml_wrap MNML_PROMPT)'
 RPROMPT='$(_mnml_wrap MNML_RPROMPT)'
 
 _mnml_bind_widgets
