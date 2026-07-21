@@ -158,6 +158,7 @@ link_into "$SCRIPT_DIR/.bashrc"           "$HOME/.bashrc"                  ".bas
 # the repo moves. We still use ln -sfn (matching the README) so edits in the
 # repo take effect immediately; users who prefer copies can adjust manually.
 link_into "$SCRIPT_DIR/sddm.conf.d"     "/etc/sddm.conf.d"             "sddm.conf.d (sudo)"
+link_into "$SCRIPT_DIR/systemd/resolved.conf.d" "/etc/systemd/resolved.conf.d" "systemd/resolved.conf.d (sudo)"
 
 # ---- summary ----------------------------------------------------------------
 
