@@ -137,17 +137,8 @@ link_into "$SCRIPT_DIR/nvim-init"         "$CONFIG_HOME/nvim"              "nvim
 link_into "$SCRIPT_DIR/zsh"               "$CONFIG_HOME/zsh"               "zsh"
 link_into "$SCRIPT_DIR/tmux"              "$CONFIG_HOME/tmux"              "tmux"
 link_into "$SCRIPT_DIR/tmux-sessionizer"  "$CONFIG_HOME/tmux-sessionizer"  "tmux-sessionizer"
+link_into "$SCRIPT_DIR/scripts"           "$HOME/.local/bin"               ".local/bin"
 link_into "$SCRIPT_DIR/opencode/skills"   "$CONFIG_HOME/opencode/skills"   "opencode/skills"
-
-# --- ~/.local/bin item symlinks --------------------------------------------
-LOCAL_SRC="${SCRIPT_DIR}/.local/bin"
-LOCAL_DEST="${HOME}/.local/bin"
-if [[ -d "$LOCAL_SRC" ]]; then
-    for item in "$LOCAL_SRC"/*; do
-        [[ -e "$item" ]] || continue
-        link_into "$item" "${LOCAL_DEST}/$(basename "$item")" ".local/bin/$(basename "$item")"
-    done
-fi
 
 # --- $HOME dotfiles ----------------------------------------------------------
 link_into "$SCRIPT_DIR/.zshenv"           "$HOME/.zshenv"                  ".zshenv"

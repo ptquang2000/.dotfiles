@@ -17,5 +17,5 @@ bind '"\e[3;5~": kill-word'
 
 alias clear='clear && history -c && printf "\e[3J"'
 
-bind -x '"\C-f": bash tmux-sessionizer'
+bind -x '"\C-f": bash ~/.config/tmux-sessionizer/scripts/tmux-sessionizer'
 bind -s 'set completion-ignore-case on'

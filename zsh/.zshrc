@@ -44,7 +44,7 @@ bindkey "^[[4~" 		end-of-line
 bindkey "^[[F"			end-of-line
 bindkey "^E" 			end-of-line
 
-bindkey -s "^f" 		"tmux-sessionizer\n"
+bindkey -s "^f" 		"~/.config/tmux-sessionizer/scripts/tmux-sessionizer\n"
 bindkey -r "^["
 
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
