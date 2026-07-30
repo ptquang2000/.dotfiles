@@ -28,10 +28,9 @@
       "format": "{icon}",
       "tooltip": false,
       "all-outputs": true,
-      "sort-by-number": true,
-      "disable-scroll": false,
-      "on-scroll-up": "hyprctl dispatch workspace +1",
-      "on-scroll-down": "hyprctl dispatch workspace -1",
+      "sort-by": "number",
+      "on-scroll-up": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e+1\" })'",
+      "on-scroll-down": "hyprctl dispatch 'hl.dsp.focus({ workspace = \"e-1\" })'",
       "active-only": false
     },
 
@@ -40,7 +39,7 @@
       "format": "󰭟",
       "tooltip": true,
       "tooltip-format": "Power Options",
-      "on-click": "wlogout"
+      "on-click": "hyprctl dispatch 'hl.dsp.exit()'"
     },
 
     "clock": {
