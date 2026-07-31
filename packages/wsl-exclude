@@ -3,7 +3,6 @@
 
 # GUI / Wayland / display stack
 bemenu-wayland
-ghostty
 gnome-themes-extra
 grim
 hypridle
@@ -43,7 +42,6 @@ anki
 mpv
 libdvdcss
 firefox-developer-edition
-zen-browser-bin
 
 # Hardware / system services
 seatd
