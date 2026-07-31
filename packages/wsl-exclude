@@ -1,0 +1,37 @@
+# Packages skipped when install.sh runs under WSL.
+# Matched by exact name against every packages/* list (pacman, yay, cargo, ...).
+
+# GUI / Wayland / display stack
+bemenu-wayland
+ghostty
+gnome-themes-extra
+grim
+hypridle
+hyprland
+hyprpaper
+hyprpolkitagent
+mako
+qt5-wayland
+qt6-5compat
+qt6-wayland
+sddm
+slurp
+waybar
+xdg-desktop-portal-hyprland
+adwaita-qt5-git
+adwaita-qt6-git
+
+# Desktop apps
+anki
+mpv
+libdvdcss
+firefox-developer-edition
+zen-browser-bin
+
+# Hardware / system services
+seatd
+vulkan-intel
+reflector
+waydroid
+waydroid-script-git
+cloudflare-warp-bin
