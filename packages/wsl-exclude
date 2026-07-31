@@ -26,7 +26,6 @@ libnotify
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
-ttf-cascadia-code-nerd
 
 # Input method (needs a desktop session)
 fcitx5-unikey
