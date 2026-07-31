@@ -20,6 +20,23 @@ waybar
 xdg-desktop-portal-hyprland
 adwaita-qt5-git
 adwaita-qt6-git
+gvfs
+libnotify
+
+# Fonts — the Windows host renders terminal text, not Linux fontconfig
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+ttf-cascadia-code-nerd
+
+# Input method (needs a desktop session)
+fcitx5-unikey
+
+# LaTeX toolchain
+texlive-basic
+texlive-binextra
+texlive-latex
+texlive-latexextra
 
 # Desktop apps
 anki
