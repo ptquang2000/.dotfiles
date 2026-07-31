@@ -1,4 +1,5 @@
 font-family = CaskaydiaCove Nerd Font
+font-size = 15
 background-opacity = 0.9
 theme = gruvbox-material-soft-dark
 clipboard-read = allow
