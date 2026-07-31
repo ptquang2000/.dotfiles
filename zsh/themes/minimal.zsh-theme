@@ -2,14 +2,15 @@
 MNML_OK_COLOR="${MNML_OK_COLOR:-2}"
 MNML_ERR_COLOR="${MNML_ERR_COLOR:-1}"
 
-MNML_USER_CHAR="${MNML_USER_CHAR:- }"
-MNML_INSERT_CHAR="${MNML_INSERT_CHAR:- }"
+MNML_USER_CHAR="${MNML_USER_CHAR-}"
+MNML_INSERT_CHAR="${MNML_INSERT_CHAR-}"
 MNML_NORMAL_CHAR="${MNML_NORMAL_CHAR:-·}"
 MNML_ELLIPSIS_CHAR="${MNML_ELLIPSIS_CHAR:-..}"
 MNML_BGJOB_MODE=${MNML_BGJOB_MODE:-4}
 
-[ "${+MNML_PROMPT}" -eq 0 ] && MNML_PROMPT=(mnml_ssh mnml_pyenv mnml_status mnml_keymap)
-[ "${+MNML_RPROMPT}" -eq 0 ] && MNML_RPROMPT=('mnml_cwd 2 0' mnml_git)
+[ "${+MNML_PROMPT}" -eq 0 ] && MNML_PROMPT=(mnml_ssh mnml_pyenv 'mnml_cwd 2 0' mnml_git)
+[ "${+MNML_INPUTLN}" -eq 0 ] && MNML_INPUTLN=(mnml_keymap)
+[ "${+MNML_RPROMPT}" -eq 0 ] && MNML_RPROMPT=()
 [ "${+MNML_INFOLN}" -eq 0 ] && MNML_INFOLN=(mnml_err mnml_jobs mnml_uhp mnml_files)
 
 
@@ -45,7 +46,7 @@ function mnml_cwd {
     local seg_len="${2:-0}"
 
     local _w="%{\e[0m%}"
-    local _g="%{\e[38;5;244m%}"
+    local _g="%{\e[38;2;146;131;116m%}"
 
     if [ "$segments" -le 0 ]; then
         segments=0
@@ -71,12 +72,12 @@ function mnml_cwd {
 }
 
 function mnml_git {
-    local statc="%{\e[0;3${MNML_OK_COLOR}m%}" # assume clean
+    local statc="%{\e[38;2;211;134;155m%}" # assume clean
     local bname="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
 
     if [ -n "$bname" ]; then
         if [ -n "$(git status --porcelain 2> /dev/null)" ]; then
-            statc="%{\e[0;3${MNML_ERR_COLOR}m%}"
+            statc="%{\e[38;2;234;105;98m%}"
         fi
         printf '%b' "$statc$bname%{\e[0m%}"
     fi
@@ -120,7 +121,7 @@ function mnml_hg_no_color {
 
 function mnml_uhp {
     local _w="%{\e[0m%}"
-    local _g="%{\e[38;5;244m%}"
+    local _g="%{\e[38;2;146;131;116m%}"
     local cwd="%~"
     cwd="${(%)cwd}"
 
@@ -151,7 +152,7 @@ function mnml_err {
 
 function mnml_jobs {
     local _w="%{\e[0m%}"
-    local _g="%{\e[38;5;244m%}"
+    local _g="%{\e[38;2;146;131;116m%}"
 
     local job_n="$(jobs | sed -n '$=')"
     if [ "$job_n" -gt 0 ]; then
@@ -162,7 +163,7 @@ function mnml_jobs {
 function mnml_files {
     local _ls="$(env which ls)"
     local _w="%{\e[0m%}"
-    local _g="%{\e[38;5;244m%}"
+    local _g="%{\e[38;2;146;131;116m%}"
 
     local a_files="$($_ls -1A | sed -n '$=')"
     local v_files="$($_ls -1 | sed -n '$=')"
@@ -241,8 +242,9 @@ function _mnml_bind_widgets() {
 autoload -U colors && colors
 setopt prompt_subst
 
-PROMPT='$(_mnml_wrap MNML_PROMPT)'
-RPROMPT='$(_mnml_wrap MNML_RPROMPT)'
+PROMPT='$(_mnml_wrap MNML_PROMPT)
+$(_mnml_wrap MNML_INPUTLN)'
+RPROMPT=''
 
 _mnml_bind_widgets
 
