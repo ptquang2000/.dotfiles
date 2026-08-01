@@ -165,7 +165,7 @@ floating_modifier $mainMod normal
 # not reachable from the headless session.
 
 # Screenshot
-bindsym $mainMod+Shift+s exec sspath="$HOME/Pictures/Screenshots/$(date +'%Y%m%d_%H%M%S_grim.png')" && grim -g "$(slurp)" "$sspath" && notify-send -t 2000 'Screenshot' "$sspath"
+bindsym $mainMod+Shift+s exec sspath="$HOME/Pictures/Screenshots/$(date +'%Y%m%d_%H%M%S_grim.png')" && grim -g "$(slurp)" "$sspath" && wl-copy < "$sspath" && notify-send -t 2000 'Screenshot' "$sspath"
 
 # ##############################
 # ### WINDOWS AND WORKSPACES ###

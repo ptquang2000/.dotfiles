@@ -207,7 +207,7 @@ hl.bind(
 hl.bind(
 	mainMod .. " + SHIFT + S",
 	hl.dsp.exec_cmd(
-		[[export sspath="${HOME}/Pictures/Screenshots/$(date +'%Y%m%d_%H%M%S_grim.png')" && grim -g "$(slurp)" $sspath && sioyek --new-window $sspath]]
+		[[export sspath="${HOME}/Pictures/Screenshots/$(date +'%Y%m%d_%H%M%S_grim.png')" && grim -g "$(slurp)" "$sspath" && wl-copy < "$sspath" && [ "$(notify-send -a screenshot -A default=Open -t 5000 'Screenshot' "$sspath")" = default ] && sioyek --new-window "$sspath"]]
 	)
 )
 

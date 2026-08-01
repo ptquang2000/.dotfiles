@@ -3,62 +3,61 @@
 #  wsl.sh
 #
 #  SYNOPSIS
-#    Self-contained bootstrap for the WSL workstation: installs
-#    packages, links configs, and hands off to sway-session.
+#    Provisions the WSL workstation: installs packages, sets the login
+#    shell and links configs. It does not start a session.
 #
 #  DESCRIPTION
-#    This is the only script to run on a WSL distro. install.sh and
-#    setup.sh are for bare-metal Arch and must NOT be run here: they
-#    install hyprland, sddm and waydroid, none of which can work in the
-#    WSL VM, and they link a desktop config set this host has no use for.
-#    Everything WSL-specific lives in this file, packages/wsl, sway/ and
-#    scripts/sway-session.
+#    This is the only provisioning script to run on a WSL distro.
+#    install.sh and setup.sh are for bare-metal Arch and must NOT be run
+#    here: they install hyprland, sddm and waydroid, none of which can
+#    work in the WSL VM, and they link a desktop config set this host has
+#    no use for. Everything WSL-specific lives in this file, packages/wsl,
+#    sway/ and scripts/sway-session.
 #
 #      1. Install packages    packages/wsl, an inclusive list; entries
 #                             also present in packages/yay come from the
 #                             AUR, the rest from the repos. Then the
 #                             cargo/npm/pip lists, which are unfiltered.
-#      2. Link configs        The subset of the repo that applies here —
+#      2. Set the login shell zsh, via chsh. Takes effect the next time
+#                             the distro is launched, not in this shell.
+#      3. Link configs        The subset of the repo that applies here —
 #                             see LINKS below. No /etc links, so sudo is
 #                             needed only for the package install.
-#      3. Start the session   Hands off to scripts/sway-session.
 #
-#    Steps 1 and 2 are skipped when they have nothing to do. Once the
-#    machine is provisioned, `sway-session` on its own is enough — it is
-#    on PATH, because scripts/ is linked to ~/.local/bin.
+#    Every step is idempotent and skipped when it has nothing to do, so
+#    re-running is cheap. Steps are also independent: a package that
+#    fails to build is reported but does not stop the shell and link
+#    steps from running. The exit status reflects the final state, so a
+#    clean exit means the host is fully provisioned.
 #
-#    WSLg cannot be used for GUI work: its rdprail-shell does not forward
-#    xdg_popup implicit grabs across the RDP boundary, so every dropdown
-#    opens and never dismisses. Running a real compositor fixes it.
-#    Nesting one inside WSLg still leaves RAIL owning the host window,
-#    which Windows cannot move, resize or position; the headless backend
-#    plus a VNC client sidesteps RAIL entirely and gives an ordinary,
-#    resizable Windows window.
+#    Starting the desktop is a separate concern, handled by
+#    scripts/sway-session. It is on PATH once this script has run,
+#    because scripts/ is linked to ~/.local/bin:
 #
-#  USAGE
-#    ./wsl.sh                 Provision if needed, then start the session.
-#    ./wsl.sh -d              ... detached, logging to /tmp/sway.log.
-#    ./wsl.sh --check         Report what is missing and exit.
-#    ./wsl.sh --provision     Install and link, then exit without starting.
-#    ./wsl.sh --no-provision  Start the session and nothing else.
+#        sway-session              # foreground; Ctrl-C ends it
+#        sway-session -d           # detached, logging to /tmp/sway.log
+#        sway-session --stop
+#        sway-session -d --port 5901 --bind 127.0.0.1
 #
-#    --port, --bind, --stop and -d are passed through to sway-session.
 #    Then connect TigerVNC Viewer on Windows to localhost:<port>.
 #
+#  USAGE
+#    ./wsl.sh                 Provision whatever is missing, then exit.
+#    ./wsl.sh --force         Re-run every step even if it looks done.
+#    ./wsl.sh --check         Report what is missing and exit.
+#
 #  NOTES
-#    - The client must be TigerVNC. wayvnc resizes the desktop to the
-#      viewer window via SetDesktopSize, which TightVNC and RealVNC do
-#      not implement. Enable it under Options -> Screen -> "Resize
-#      remote session to the local window size".
-#    - wayvnc binds 0.0.0.0 by default, not 127.0.0.1: WSL2's localhost
-#      relay reaches the VM over its network interface, so a
-#      loopback-only bind is invisible from Windows. The VM is NAT'd so
-#      this is not LAN-visible, but the listener is unauthenticated and
-#      unencrypted — any process on the Windows host can connect.
+#    - WSLg cannot be used for GUI work: its rdprail-shell does not
+#      forward xdg_popup implicit grabs across the RDP boundary, so every
+#      dropdown opens and never dismisses. Running a real compositor
+#      fixes it. Nesting one inside WSLg still leaves RAIL owning the
+#      host window, which Windows cannot move, resize or position; the
+#      headless backend plus a VNC client sidesteps RAIL entirely and
+#      gives an ordinary, resizable Windows window. Hence sway on the
+#      wlroots headless backend, exported over VNC by wayvnc.
 #    - Everything is software-rendered; there is no /dev/dri here.
 #    - There is no audio: VNC has no audio channel and
-#      /mnt/wslg/PulseServer is not reachable from this session.
-#    - The distro must stay running; wayvnc dies with the VM.
+#      /mnt/wslg/PulseServer is not reachable from that session.
 # =====================================================================
 
 set -euo pipefail
@@ -73,11 +72,10 @@ CARGO_FILE="${PKG_DIR}/cargo"
 NPM_FILE="${PKG_DIR}/package.json"
 PIP_FILE="${PKG_DIR}/requirements.txt"
 
-LAUNCHER="${SCRIPT_DIR}/scripts/sway-session"
+ZSH_BIN="/usr/bin/zsh"
 
-PROVISION="auto"        # auto | only | never
+FORCE=0
 CHECK_ONLY=0
-LAUNCH_ARGS=()
 
 # The repo subset that applies to a headless WSL host, as "src:dest" pairs.
 # Everything lands under $HOME, so none of this needs sudo. Deliberately
@@ -97,8 +95,8 @@ LINKS=(
     ".bashrc:$HOME/.bashrc"
 )
 
-# Commands that must exist before the session can come up. Anything missing
-# means the package set has not been installed yet.
+# Commands that must exist once provisioning is done. Anything missing means
+# the package set has not been installed, or failed to install.
 SESSION_CMDS=(sway swaybg wayvnc ghostty)
 
 log()  { printf '\033[1;34m[*]\033[0m %s\n' "$*"; }
@@ -118,13 +116,10 @@ usage() { sed -n '2,/^# ====/p' "${BASH_SOURCE[0]}" | sed 's/^#\ \?//'; }
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --provision) PROVISION="only"; shift ;;
-        --no-provision) PROVISION="never"; shift ;;
+        --force) FORCE=1; shift ;;
         --check) CHECK_ONLY=1; shift ;;
         -h|--help) usage; exit 0 ;;
-        # Everything else belongs to sway-session.
-        --port|--bind) LAUNCH_ARGS+=("$1" "$2"); shift 2 ;;
-        *) LAUNCH_ARGS+=("$1"); shift ;;
+        *) err "Unknown argument: $1"; err "Try --help."; exit 2 ;;
     esac
 done
 
@@ -164,41 +159,59 @@ unlinked() {
     done
 }
 
-sway_running() { pgrep -x sway >/dev/null 2>&1; }
+login_shell() { getent passwd "$USER" | cut -d: -f7; }
+
+# True while the login shell is still whatever the distro image shipped.
+shell_wrong() { [[ "$(login_shell)" != "$ZSH_BIN" ]]; }
 
 # --- install -----------------------------------------------------------
+# Failures here warn rather than abort: the shell and link steps are
+# independent of the package set and must still run. main() re-checks the
+# state afterwards and exits non-zero if anything is genuinely missing.
 install_packages() {
     if [[ ! -r "$WSL_FILE" ]]; then
         err "$WSL_FILE is missing; nothing to install."
-        exit 1
+        return 1
     fi
 
-    local repo aur
+    local repo aur rc=0
     mapfile -t repo < <(repo_pkgs)
     mapfile -t aur < <(aur_pkgs)
 
     if (( ${#repo[@]} )); then
         log "Installing ${#repo[@]} repo packages from packages/wsl"
-        as_root pacman -Syu --noconfirm --needed --quiet
-        as_root pacman -S --noconfirm --needed "${repo[@]}"
-        ok "pacman batch install succeeded."
+        if as_root pacman -Syu --noconfirm --needed --quiet &&
+           as_root pacman -S --noconfirm --needed "${repo[@]}"; then
+            ok "pacman batch install succeeded."
+        else
+            warn "pacman install failed; continuing."
+            rc=1
+        fi
     fi
 
     if (( ${#aur[@]} )); then
-        bootstrap_yay
-        log "Installing ${#aur[@]} AUR packages with yay"
-        yay -S --noconfirm --needed "${aur[@]}"
-        ok "yay batch install succeeded."
+        if bootstrap_yay; then
+            log "Installing ${#aur[@]} AUR packages with yay"
+            if yay -S --noconfirm --needed "${aur[@]}"; then
+                ok "yay batch install succeeded."
+            else
+                warn "yay install failed; continuing."
+                rc=1
+            fi
+        else
+            warn "yay unavailable; skipped ${#aur[@]} AUR packages."
+            rc=1
+        fi
     fi
 
-    install_lang_packages
-    configure_shell
+    install_lang_packages || rc=1
+    return $rc
 }
 
 bootstrap_yay() {
     need_cmd yay && return 0
     log "yay not found; bootstrapping."
-    as_root pacman -S --noconfirm --needed base-devel git
+    as_root pacman -S --noconfirm --needed base-devel git || return 1
     local build
     build="$(mktemp -d)"
     (
@@ -206,20 +219,21 @@ bootstrap_yay() {
         git clone --depth=1 https://aur.archlinux.org/yay.git
         cd yay
         makepkg -si --noconfirm
-    )
+    ) || { rm -rf "$build"; return 1; }
     rm -rf "$build"
 }
 
 # The cargo/npm/pip lists are not WSL-filtered — every entry works here.
+# One entry that fails to build must not take the rest of the run with it.
 install_lang_packages() {
-    local items item
+    local items item rc=0
 
     mapfile -t items < <(read_pkg_file "$CARGO_FILE")
     if (( ${#items[@]} )) && need_cmd cargo; then
         for item in "${items[@]}"; do
-            cargo install --locked "$item"
+            cargo install --locked "$item" || { warn "cargo: $item failed."; rc=1; }
         done
-        ok "cargo crates installed."
+        ok "cargo crates processed."
     fi
 
     if [[ -r "$NPM_FILE" ]] && need_cmd npm; then
@@ -227,26 +241,50 @@ install_lang_packages() {
         deps="$(node -e "const p=require('$NPM_FILE'); console.log(Object.keys(p.dependencies||{}).join(' '))")"
         if [[ -n "$deps" ]]; then
             # shellcheck disable=SC2086
-            as_root npm install -g $deps
-            ok "npm packages installed."
+            if as_root npm install -g $deps; then
+                ok "npm packages installed."
+            else
+                warn "npm install failed."
+                rc=1
+            fi
         fi
     fi
 
     mapfile -t items < <(read_pkg_file "$PIP_FILE")
     if (( ${#items[@]} )) && need_cmd pipx; then
         for item in "${items[@]}"; do
-            pipx install "$item" || pipx upgrade "$item"
+            pipx install "$item" || pipx upgrade "$item" || { warn "pipx: $item failed."; rc=1; }
         done
-        ok "pip packages installed."
+        ok "pip packages processed."
     fi
+
+    return $rc
 }
 
+# --- login shell -------------------------------------------------------
+# A first-class step, not a tail-end of the package install: on a host where
+# the packages are already present this is the only thing left to do. chsh
+# authenticates through PAM on its own, separately from the sudo used above,
+# so it prompts for a password and can be declined — that must not be fatal.
 configure_shell() {
-    local current
-    current="$(getent passwd "$USER" | cut -d: -f7)"
-    if [[ "$current" != "/usr/bin/zsh" ]] && [[ -x /usr/bin/zsh ]]; then
-        log "Setting login shell to zsh"
-        chsh -s /usr/bin/zsh
+    if [[ ! -x "$ZSH_BIN" ]]; then
+        warn "$ZSH_BIN not installed; leaving login shell as $(login_shell)."
+        return 1
+    fi
+    if ! shell_wrong; then
+        return 0
+    fi
+    if ! grep -qxF "$ZSH_BIN" /etc/shells 2>/dev/null; then
+        warn "$ZSH_BIN is not listed in /etc/shells; chsh will refuse it."
+        return 1
+    fi
+
+    log "Setting login shell to zsh (takes effect next time the distro starts)"
+    if chsh -s "$ZSH_BIN"; then
+        ok "Login shell set to $ZSH_BIN."
+    else
+        warn "chsh failed or was declined; run 'chsh -s $ZSH_BIN' by hand."
+        return 1
     fi
 }
 
@@ -282,54 +320,59 @@ link_configs() {
     ok "Configs linked."
 }
 
+# --- provision ---------------------------------------------------------
+# Each step decides for itself whether it has work to do. None of them can
+# abort the others, so a single failure never leaves the host half-set-up
+# in a way that a re-run would not fix.
 provision() {
     local missing unlinked_now
     missing="$(missing_cmds)"
     unlinked_now="$(unlinked)"
 
-    if [[ "$PROVISION" == "only" || -n "$missing" ]]; then
+    if (( FORCE )) || [[ -n "$missing" ]]; then
         [[ -n "$missing" ]] && log "Missing: $(tr '\n' ' ' <<<"$missing")"
-        install_packages
+        install_packages || true
     fi
 
-    if [[ "$PROVISION" == "only" || -n "$unlinked_now" ]]; then
+    if (( FORCE )) || shell_wrong; then
+        configure_shell || true
+    fi
+
+    if (( FORCE )) || [[ -n "$unlinked_now" ]]; then
         [[ -n "$unlinked_now" ]] && log "Not linked: $(tr '\n' ' ' <<<"$unlinked_now")"
         link_configs
     fi
-
-    missing="$(missing_cmds)"
-    if [[ -n "$missing" ]]; then
-        err "Still missing after provisioning: $(tr '\n' ' ' <<<"$missing")"
-        exit 1
-    fi
-    unlinked_now="$(unlinked)"
-    if [[ -n "$unlinked_now" ]]; then
-        err "Still not linked: $(tr '\n' ' ' <<<"$unlinked_now")"
-        exit 1
-    fi
 }
 
+# Reports the state and returns non-zero if the host is not fully provisioned.
+# The login shell is advisory: chsh can legitimately be declined, and nothing
+# else in the repo depends on it, so it warns but does not fail the run.
 report_state() {
-    local missing unlinked_now
+    local missing unlinked_now rc=0
+
     missing="$(missing_cmds)"
     if [[ -n "$missing" ]]; then
         warn "Packages not installed: $(tr '\n' ' ' <<<"$missing")"
+        rc=1
     else
         ok "Session packages present."
+    fi
+
+    if shell_wrong; then
+        warn "Login shell is $(login_shell), not $ZSH_BIN."
+    else
+        ok "Login shell is zsh."
     fi
 
     unlinked_now="$(unlinked)"
     if [[ -n "$unlinked_now" ]]; then
         warn "Not linked: $(tr '\n' ' ' <<<"$unlinked_now")"
+        rc=1
     else
         ok "Configs linked (${#LINKS[@]} entries)."
     fi
 
-    if sway_running; then
-        ok "A sway session is running."
-    else
-        log "No sway session running."
-    fi
+    return $rc
 }
 
 # --- main --------------------------------------------------------------
@@ -340,17 +383,18 @@ main() {
     fi
 
     if (( CHECK_ONLY )); then
-        report_state
+        report_state || true
         exit 0
     fi
 
-    [[ "$PROVISION" == "never" ]] || provision
-    if [[ "$PROVISION" == "only" ]]; then
-        ok "Provisioned. Start the session with: sway-session"
-        exit 0
-    fi
+    provision
 
-    exec "$LAUNCHER" "${LAUNCH_ARGS[@]+"${LAUNCH_ARGS[@]}"}"
+    echo
+    if ! report_state; then
+        err "Provisioning incomplete; re-run ./wsl.sh once the errors above are resolved."
+        exit 1
+    fi
+    ok "Provisioned. Start the desktop with: sway-session"
 }
 
 main "$@"

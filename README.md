@@ -116,27 +116,33 @@ chmod +x install.sh setup.sh
 
 ## WSL
 
-`wsl.sh` is the only script to run on a WSL distro, and it is self-contained —
-it installs packages, links configs and starts the session by itself.
-**Do not run `install.sh` or `setup.sh` here**: those are for bare-metal Arch
-and know nothing about WSL, so they would install hyprland, sddm and waydroid
-and link a desktop config set this host cannot use.
+`wsl.sh` is the only provisioning script to run on a WSL distro. It installs
+packages, sets the login shell and links configs — it does **not** start a
+session; that is `sway-session`'s job. **Do not run `install.sh` or `setup.sh`
+here**: those are for bare-metal Arch and know nothing about WSL, so they would
+install hyprland, sddm and waydroid and link a desktop config set this host
+cannot use.
 
 ```bash
 chmod +x wsl.sh        # first time only
 
-# Install packages if absent, link configs if absent, then start
-# sway + wayvnc. Everything is software-rendered (no /dev/dri).
+# Install packages, set the login shell to zsh, link configs. Each step is
+# skipped when it has nothing to do, so re-running is cheap.
 ./wsl.sh
 
 ./wsl.sh --check       # report what is missing, change nothing
-./wsl.sh --provision   # install and link, then exit without starting
-./wsl.sh --no-provision  # start the session and nothing else
+./wsl.sh --force       # re-run every step even if it looks done
 ```
 
-Once provisioned, `wsl.sh` has nothing left to do — it just hands off to
-`sway-session`, which is on `PATH` because `scripts/` is linked to
-`~/.local/bin`. Use that directly from then on:
+The three steps are independent: a package that fails to build is reported but
+does not stop the shell and link steps from running, so a partial failure never
+leaves the host half-set-up. The exit status reflects the state afterwards, so
+a clean exit means the host is fully provisioned. `chsh` only rewrites the
+`/etc/passwd` entry — the new login shell takes effect the next time the distro
+is launched, not in the shell that ran the script.
+
+Starting the desktop is separate. `sway-session` is on `PATH` once `wsl.sh` has
+run, because `scripts/` is linked to `~/.local/bin`:
 
 ```bash
 sway-session           # foreground; Ctrl-C ends it
@@ -144,9 +150,6 @@ sway-session -d        # detached, logging to /tmp/sway.log
 sway-session --stop
 sway-session -d --port 5901 --bind 127.0.0.1
 ```
-
-`wsl.sh` passes `-d`, `--stop`, `--port` and `--bind` straight through, so
-`./wsl.sh -d` works too.
 
 Packages come from `packages/wsl`, an inclusive list — anything absent from it
 is not installed. Entries that also appear in `packages/yay` are fetched from
