@@ -80,8 +80,15 @@ check_xwayland() {
 #   instead of attaching to the compositor started here.
 # pixman + LIBGL_ALWAYS_SOFTWARE: the VM has /dev/dxg but no /dev/dri, so
 #   without these Mesa falls through to zink, finds no Vulkan ICD and dies.
+# LANG: WSL runs no pam_env and no systemd user session, so /etc/locale.conf
+#   is never applied and the launching shell has LANG unset. Anything that
+#   picks its charset from the locale then falls back to ASCII — tmux most
+#   visibly, which replaces every non-ASCII cell with "_", so nerd-font icons
+#   and powerline separators vanish. C.UTF-8 is built into glibc and needs no
+#   locale-gen, unlike the en_US.UTF-8 ghostty substitutes when LANG is empty.
 session_env() {
     printf '%s\n' \
+        LANG=C.UTF-8 \
         WLR_BACKENDS=headless \
         WLR_RENDERER=pixman \
         LIBGL_ALWAYS_SOFTWARE=1 \
