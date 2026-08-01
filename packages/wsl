@@ -1,0 +1,119 @@
+# Package set installed by install.sh when running under WSL.
+#
+# Inclusive, not subtractive: this file REPLACES packages/pacman and
+# packages/yay on a WSL host. Whatever is not listed here is not installed.
+# Entries that come from the AUR must also appear in packages/yay — that is
+# how install.sh knows to route them through yay instead of pacman.
+#
+# packages/cargo, packages/package.json and packages/requirements.txt are not
+# filtered; every entry in those works unchanged under WSL.
+#
+# The desktop here is sway on the wlroots headless backend, exported over VNC
+# by wayvnc (see wsl.sh) rather than WSLg. That is a real Wayland session with
+# Linux-side rendering, so compositor, fonts, themes and input method all
+# belong here. Only things that need hardware the WSL VM does not have, or a
+# compositor it cannot run, are left out — see the tail of this file.
+
+# --- shell & CLI -------------------------------------------------------
+aria2
+bc
+fd
+fzf
+jq
+less
+neovim
+opencode
+ripgrep
+tmux
+unzip
+wget
+zip
+zsh
+
+# --- languages & build tools -------------------------------------------
+bear
+clang
+go
+npm
+python-pipx
+rust
+
+# --- containers & virtual machines --------------------------------------
+dnsmasq
+docker
+docker-buildx
+docker-compose
+edk2-ovmf
+libvirt
+qemu-desktop
+virt-manager
+
+# --- wayland session ----------------------------------------------------
+# sway pulls in wlroots and seatd; seatd needs no service on the headless
+# backend, which opens no privileged devices.
+sway
+swaybg
+wayvnc
+wl-clipboard
+bemenu-wayland
+mako
+libnotify
+grim
+slurp
+gvfs
+xdg-desktop-portal-wlr
+xorg-xwayland
+
+# --- toolkits & theming -------------------------------------------------
+gnome-themes-extra
+qt5-wayland
+qt6-wayland
+qt6-5compat
+adwaita-qt5-git
+adwaita-qt6-git
+
+# --- fonts --------------------------------------------------------------
+# Needed here, unlike under WSLg: in a VNC session the Linux side rasterizes
+# every glyph, so CJK and emoji coverage has to come from fontconfig.
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+ttf-cascadia-code-nerd
+
+# --- input method -------------------------------------------------------
+# fcitx5-unikey
+
+# --- applications -------------------------------------------------------
+# anki
+# firefox-developer-edition
+ghostty
+zen-browser-bin
+
+# --- documents ----------------------------------------------------------
+# texlive-basic
+# texlive-binextra
+# texlive-latex
+# texlive-latexextra
+
+# --- system -------------------------------------------------------------
+# reflector
+
+# =======================================================================
+# Deliberately absent, and why:
+#
+#   hyprland, hypridle, hyprpaper,   Aquamarine needs a DRM render node; the
+#   hyprpolkitagent,                 VM has only /dev/dxg. Replaced by sway,
+#   xdg-desktop-portal-hyprland      swaybg and xdg-desktop-portal-wlr.
+#   waybar                           waybar/config.jsonc is built on
+#                                    hyprland/* modules. sway's own bar is
+#                                    configured in sway/config instead.
+#   sddm                             No display manager; wsl.sh starts the
+#                                    session from a shell.
+#   waydroid, waydroid-script-git    Needs binder/ashmem, absent from the
+#                                    WSL kernel.
+#   vulkan-intel                     No Intel DRM device to drive.
+#   mpv, libdvdcss                   VNC carries no audio channel, and there
+#                                    is no optical drive.
+#   cloudflare-warp-bin              WSL networking is NAT'd through Windows;
+#                                    run WARP on the host instead.
+# =======================================================================

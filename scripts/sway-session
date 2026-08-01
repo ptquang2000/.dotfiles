@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+# =====================================================================
+#  sway-session
+#
+#  Starts the WSL graphical session: sway on the wlroots headless
+#  backend, with wayvnc exported from sway/config. On PATH because
+#  scripts/ is linked to ~/.local/bin.
+#
+#  USAGE
+#    sway-session            Run in the foreground; Ctrl-C ends it.
+#    sway-session -d         Detach, logging to /tmp/sway.log.
+#    sway-session --stop     End a running session.
+#    sway-session --port 5901 --bind 127.0.0.1
+#
+#  Then connect TigerVNC Viewer on Windows to localhost:<port>. See the
+#  WSL section of README.md for why the client must be TigerVNC, and
+#  wsl.sh for first-time provisioning.
+# =====================================================================
+
+set -euo pipefail
+
+LOG="/tmp/sway.log"
+WAYVNC_ADDRESS="0.0.0.0"
+WAYVNC_PORT="5900"
+DETACH=0
+STOP=0
+
+log()  { printf '\033[1;34m[*]\033[0m %s\n' "$*"; }
+warn() { printf '\033[1;33m[!]\033[0m %s\n' "$*" >&2; }
+err()  { printf '\033[1;31m[x]\033[0m %s\n' "$*" >&2; }
+ok()   { printf '\033[1;32m[+]\033[0m %s\n' "$*"; }
+
+usage() { sed -n '2,/^# ====/p' "${BASH_SOURCE[0]}" | sed 's/^#\ \?//'; }
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -d|--detach) DETACH=1; shift ;;
+        --stop) STOP=1; shift ;;
+        --port) WAYVNC_PORT="$2"; shift 2 ;;
+        --bind) WAYVNC_ADDRESS="$2"; shift 2 ;;
+        -h|--help) usage; exit 0 ;;
+        *) err "Unknown argument: $1"; exit 2 ;;
+    esac
+done
+
+# $SWAYSOCK is not trustworthy here: sway's /etc/sway/config.d/50-systemd-user.conf
+# imports it into the systemd user manager, where it outlives the session.
+sway_running() { pgrep -x sway >/dev/null 2>&1; }
+
+sway_socket() { ls /run/user/"$(id -u)"/sway-ipc.* 2>/dev/null | head -1; }
+
+stop_session() {
+    if ! sway_running; then
+        log "No sway session running."
+        return 0
+    fi
+    local sock
+    sock="$(sway_socket)"
+    if [[ -z "$sock" ]]; then
+        err "sway is running but its IPC socket is missing; kill it by hand."
+        exit 1
+    fi
+    SWAYSOCK="$sock" swaymsg exit >/dev/null 2>&1 || true
+    ok "Session stopped."
+}
+
+# WSLg bind-mounts /tmp/.X11-unix read-only, so XWayland cannot create its
+# socket and sway logs a wall of "sticky bit not set" before giving up. Only
+# matters if X11 clients are needed; the remount is not persistent.
+check_xwayland() {
+    [[ -d /tmp/.X11-unix ]] || return 0
+    [[ -w /tmp/.X11-unix ]] && return 0
+    warn "/tmp/.X11-unix is read-only (WSLg bind mount); XWayland will not start."
+    warn "For X11 clients: sudo mount -o remount,rw /tmp/.X11-unix && sudo chmod 1777 /mnt/wslg/.X11-unix"
+}
+
+# env -u TMUX -u TMUX_PANE: launching from a tmux pane otherwise leaks these
+#   into the session, and tmux inside it then refuses to start.
+# env -u WAYLAND_DISPLAY -u DISPLAY: stops clients reaching back to WSLg
+#   instead of attaching to the compositor started here.
+# pixman + LIBGL_ALWAYS_SOFTWARE: the VM has /dev/dxg but no /dev/dri, so
+#   without these Mesa falls through to zink, finds no Vulkan ICD and dies.
+session_env() {
+    printf '%s\n' \
+        WLR_BACKENDS=headless \
+        WLR_RENDERER=pixman \
+        LIBGL_ALWAYS_SOFTWARE=1 \
+        "WAYVNC_ADDRESS=$WAYVNC_ADDRESS" \
+        "WAYVNC_PORT=$WAYVNC_PORT" \
+        XDG_CURRENT_DESKTOP=sway \
+        XDG_SESSION_TYPE=wayland \
+        XCURSOR_SIZE=24 \
+        GTK_THEME=Adwaita:dark \
+        GTK2_RC_FILES=/usr/share/themes/Adwaita-dark/gtk-2.0/gtkrc \
+        MOZ_ENABLE_WAYLAND=1 \
+        QT_STYLE_OVERRIDE=Adwaita-Dark \
+        QT_QPA_PLATFORM=wayland \
+        QT_QPA_PLATFORMTHEME=qt5ct
+}
+
+main() {
+    if (( STOP )); then
+        stop_session
+        exit 0
+    fi
+
+    if sway_running; then
+        err "sway is already running. End it with: sway-session --stop"
+        exit 1
+    fi
+
+    check_xwayland
+
+    local envv
+    mapfile -t envv < <(session_env)
+
+    if (( DETACH )); then
+        log "Starting sway detached; logging to $LOG"
+        nohup env -u TMUX -u TMUX_PANE -u WAYLAND_DISPLAY -u DISPLAY \
+            "${envv[@]}" sway >"$LOG" 2>&1 &
+        disown
+
+        local i
+        for i in 1 2 3 4 5 6 7 8 9 10; do
+            if [[ -n "$(sway_socket)" ]]; then break; fi
+            sleep 0.5
+        done
+        if [[ -z "$(sway_socket)" ]]; then
+            err "sway did not come up; last lines of $LOG:"
+            tail -20 "$LOG" >&2 || true
+            exit 1
+        fi
+        ok "Session up. Connect TigerVNC Viewer to localhost:${WAYVNC_PORT}"
+        log "Logs:  tail -f $LOG"
+        log "Stop:  sway-session --stop"
+        exit 0
+    fi
+
+    log "Starting sway on ${WAYVNC_ADDRESS}:${WAYVNC_PORT} (Ctrl-C to end)"
+    exec env -u TMUX -u TMUX_PANE -u WAYLAND_DISPLAY -u DISPLAY \
+        "${envv[@]}" sway
+}
+
+main "$@"

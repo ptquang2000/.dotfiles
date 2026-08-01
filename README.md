@@ -114,6 +114,61 @@ chmod +x install.sh setup.sh
 ./setup.sh
 ```
 
+## WSL
+
+`wsl.sh` is the only script to run on a WSL distro, and it is self-contained —
+it installs packages, links configs and starts the session by itself.
+**Do not run `install.sh` or `setup.sh` here**: those are for bare-metal Arch
+and know nothing about WSL, so they would install hyprland, sddm and waydroid
+and link a desktop config set this host cannot use.
+
+```bash
+chmod +x wsl.sh        # first time only
+
+# Install packages if absent, link configs if absent, then start
+# sway + wayvnc. Everything is software-rendered (no /dev/dri).
+./wsl.sh
+
+./wsl.sh --check       # report what is missing, change nothing
+./wsl.sh --provision   # install and link, then exit without starting
+./wsl.sh --no-provision  # start the session and nothing else
+```
+
+Once provisioned, `wsl.sh` has nothing left to do — it just hands off to
+`sway-session`, which is on `PATH` because `scripts/` is linked to
+`~/.local/bin`. Use that directly from then on:
+
+```bash
+sway-session           # foreground; Ctrl-C ends it
+sway-session -d        # detached, logging to /tmp/sway.log
+sway-session --stop
+sway-session -d --port 5901 --bind 127.0.0.1
+```
+
+`wsl.sh` passes `-d`, `--stop`, `--port` and `--bind` straight through, so
+`./wsl.sh -d` works too.
+
+Packages come from `packages/wsl`, an inclusive list — anything absent from it
+is not installed. Entries that also appear in `packages/yay` are fetched from
+the AUR, the rest from the repos; the `cargo`, `package.json` and
+`requirements.txt` lists are used unchanged. Only the repo subset that applies
+to a headless host is linked (sway, ghostty, mako, nvim, zsh, tmux, scripts, …),
+all under `$HOME`, so provisioning needs sudo only for the package install
+itself.
+
+WSLg cannot be used for GUI work: its `rdprail-shell` does not forward
+`xdg_popup` implicit grabs, so every dropdown opens and never dismisses.
+Hence sway on the wlroots headless backend, exported over VNC.
+
+Then connect **TigerVNC Viewer** on Windows to `localhost:5900`, with
+Options → Screen → "Resize remote session to the local window size". The
+client must be TigerVNC — TightVNC and RealVNC do not implement
+`SetDesktopSize`, so the desktop will not fit the window.
+
+The VNC listener is unauthenticated; the WSL VM is NAT'd so it is not
+LAN-visible, but any process on the Windows host can connect. There is no
+audio in the session, and clipboard sharing is plain text only.
+
 # Post-install (Linux)
 
 ## Enable services

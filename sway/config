@@ -1,0 +1,181 @@
+# Arch ships 50-systemd-user.conf here, which pushes WAYLAND_DISPLAY, SWAYSOCK
+# and XDG_CURRENT_DESKTOP into the systemd user manager and D-Bus. Without it
+# user services and xdg-desktop-portal-wlr cannot reach the compositor.
+include /etc/sway/config.d/*
+
+# ################
+# ### MONITORS ###
+# ################
+#
+# The session runs on the wlroots headless backend, so this output is
+# synthetic: wayvnc creates HEADLESS-1 and renegotiates its mode every time
+# the VNC client window is resized. The mode below is only the size the
+# session comes up at. Check what it actually is with:
+#     swaymsg -t get_outputs
+
+output HEADLESS-1 mode 1920x1080
+output * bg #1d2021 solid_color
+
+# ###################
+# ### MY PROGRAMS ###
+# ###################
+#
+# ghostty is single-instance by default: a second invocation hands off to the
+# running one and exits immediately, so the keybind below would do nothing.
+
+set $terminal ghostty --gtk-single-instance=false
+set $menu bemenu-run --fn "CaskaydiaCove Nerd Font" --hp 6
+set $browser zen-browser
+set $vm virt-manager
+
+# #############################
+# ### ENVIRONMENT VARIABLES ###
+# #############################
+#
+# sway has no `env` directive — the session environment (software rendering,
+# theming, the wayvnc bind address) is exported by wsl.sh before it execs
+# sway. Look there, not here.
+
+# #################
+# ### AUTOSTART ###
+# #################
+
+exec wayvnc "${WAYVNC_ADDRESS:-0.0.0.0}" "${WAYVNC_PORT:-5900}"
+exec fcitx5 -d -r
+exec mako
+exec gsettings set org.gnome.desktop.interface gtk-theme "Adwaita:Dark"
+exec gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+exec mkdir -p "$HOME/Work"
+exec mkdir -p "$HOME/Downloads"
+exec mkdir -p "$HOME/Pictures/Screenshots"
+exec $terminal
+exec $browser
+
+# #####################
+# ### LOOK AND FEEL ###
+# #####################
+
+default_border none
+default_floating_border none
+titlebar_border_thickness 0
+gaps inner 0
+gaps outer 0
+
+#                       border   background text     indicator child_border
+client.focused          #1d2021  #1d2021    #ebdbb2  #1d2021   #1d2021
+client.focused_inactive #1d2021  #1d2021    #a89984  #1d2021   #1d2021
+client.unfocused        #1d2021  #1d2021    #a89984  #1d2021   #1d2021
+client.urgent           #cc241d  #cc241d    #ebdbb2  #cc241d   #cc241d
+
+# waybar is not installed under WSL — its config is built on hyprland/*
+# modules — so this is sway's own bar instead.
+bar {
+    position top
+    font pango:CaskaydiaCove Nerd Font 10
+    status_command while date +'%a %d %b  %H:%M'; do sleep 20; done
+    colors {
+        background #1d2021
+        statusline #ebdbb2
+        separator  #504945
+        focused_workspace  #504945 #504945 #ebdbb2
+        active_workspace   #1d2021 #1d2021 #ebdbb2
+        inactive_workspace #1d2021 #1d2021 #a89984
+        urgent_workspace   #cc241d #cc241d #ebdbb2
+    }
+}
+
+# #############
+# ### INPUT ###
+# #############
+
+input type:keyboard {
+    xkb_layout us
+}
+
+input type:pointer {
+    accel_profile adaptive
+    pointer_accel 0
+}
+
+input type:touchpad {
+    natural_scroll disabled
+}
+
+focus_follows_mouse yes
+
+# ###################
+# ### KEYBINDINGS ###
+# ###################
+#
+# ALT rather than Super: Windows swallows most Super combinations before the
+# VNC client ever sees them.
+
+set $mainMod Mod1
+
+bindsym $mainMod+Return exec $terminal
+bindsym $mainMod+Shift+b exec $browser
+bindsym $mainMod+Shift+v exec $vm
+bindsym $mainMod+w kill
+bindsym $mainMod+space exec $menu
+# No poweroff bind here — that would take down the whole WSL VM.
+bindsym $mainMod+Shift+m exit
+bindsym $mainMod+Shift+c reload
+
+bindsym $mainMod+h focus left
+bindsym $mainMod+l focus right
+bindsym $mainMod+k focus up
+bindsym $mainMod+j focus down
+
+bindsym $mainMod+Shift+h move left
+bindsym $mainMod+Shift+l move right
+bindsym $mainMod+Shift+k move up
+bindsym $mainMod+Shift+j move down
+
+bindsym $mainMod+v splitv
+bindsym $mainMod+b splith
+bindsym $mainMod+f fullscreen
+bindsym $mainMod+Shift+space floating toggle
+
+bindsym $mainMod+1 workspace number 1
+bindsym $mainMod+2 workspace number 2
+bindsym $mainMod+3 workspace number 3
+bindsym $mainMod+4 workspace number 4
+bindsym $mainMod+5 workspace number 5
+bindsym $mainMod+6 workspace number 6
+bindsym $mainMod+7 workspace number 7
+bindsym $mainMod+8 workspace number 8
+bindsym $mainMod+9 workspace number 9
+bindsym $mainMod+0 workspace number 10
+
+bindsym $mainMod+Shift+1 move container to workspace number 1
+bindsym $mainMod+Shift+2 move container to workspace number 2
+bindsym $mainMod+Shift+3 move container to workspace number 3
+bindsym $mainMod+Shift+4 move container to workspace number 4
+bindsym $mainMod+Shift+5 move container to workspace number 5
+bindsym $mainMod+Shift+6 move container to workspace number 6
+bindsym $mainMod+Shift+7 move container to workspace number 7
+bindsym $mainMod+Shift+8 move container to workspace number 8
+bindsym $mainMod+Shift+9 move container to workspace number 9
+bindsym $mainMod+Shift+0 move container to workspace number 10
+
+# Left drag moves, right drag resizes.
+floating_modifier $mainMod normal
+
+# No audio binds: VNC carries no audio channel, and /mnt/wslg/PulseServer is
+# not reachable from the headless session.
+
+# Screenshot
+bindsym $mainMod+Shift+s exec sspath="$HOME/Pictures/Screenshots/$(date +'%Y%m%d_%H%M%S_grim.png')" && grim -g "$(slurp)" "$sspath" && notify-send -t 2000 'Screenshot' "$sspath"
+
+# ##############################
+# ### WINDOWS AND WORKSPACES ###
+# ##############################
+
+assign [app_id="zen"] workspace number 1
+assign [app_id="com.mitchellh.ghostty"] workspace number 2
+assign [app_id="virt-manager"] workspace number 3
+
+# A VM console has a fixed aspect ratio and tiles badly.
+for_window [app_id="virt-manager"] floating enable
+
+for_window [title="^([Pp]icture[-\s]in[-\s][Pp]icture)$"] floating enable, sticky enable

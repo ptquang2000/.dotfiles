@@ -16,8 +16,6 @@
 #    - Installs the where-is-my-sddm-theme and enables sddm.
 #    - Initializes waydroid with GAPPS and installs libndk/libhoudini.
 #    - Idempotent: safe to re-run.
-#    - Under WSL, packages listed in `packages/wsl-exclude` are dropped
-#      from every package list, and the SDDM/waydroid steps are skipped.
 #
 #  USAGE
 #    ./install.sh
@@ -37,7 +35,6 @@ AUR_FILE="${PKG_DIR}/yay"
 CARGO_FILE="${PKG_DIR}/cargo"
 NPM_FILE="${PKG_DIR}/package.json"
 PIP_FILE="${PKG_DIR}/requirements.txt"
-WSL_EXCLUDE_FILE="${PKG_DIR}/wsl-exclude"
 
 SDDM_THEME_DIR="/usr/share/sddm/themes/where_is_my_sddm_theme"
 SDDM_THEME_REPO="https://github.com/ptquang2000/where-is-my-sddm-theme.git"
@@ -48,8 +45,6 @@ err()  { printf '\033[1;31m[x]\033[0m %s\n' "$*" >&2; }
 ok()   { printf '\033[1;32m[+]\033[0m %s\n' "$*"; }
 
 need_cmd() { command -v "$1" >/dev/null 2>&1; }
-
-is_wsl() { [[ -n "${WSL_DISTRO_NAME:-}" ]] || grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; }
 
 require_sudo() {
     if [[ $EUID -ne 0 ]] && ! need_cmd sudo; then
@@ -69,17 +64,9 @@ as_root() {
 # --- helpers -----------------------------------------------------------
 read_pkg_file() {
     # Strips blank lines and comments; prints one package per line.
-    # Under WSL, drops anything listed in packages/wsl-exclude.
     local file="$1"
     [[ -r "$file" ]] || return 0
-    local out
-    out="$(grep -vE '^\s*(#|$)' "$file" || true)"
-    if is_wsl && [[ -r "$WSL_EXCLUDE_FILE" ]]; then
-        local excl
-        excl="$(grep -vE '^\s*(#|$)' "$WSL_EXCLUDE_FILE" || true)"
-        [[ -n "$excl" ]] && out="$(grep -Fxv -f <(printf '%s\n' "$excl") <<<"$out" || true)"
-    fi
-    printf '%s\n' "$out" | grep -vE '^\s*$' || true
+    grep -vE '^\s*(#|$)' "$file" || true
 }
 
 # --- arch --------------------------------------------------------------
@@ -178,7 +165,6 @@ configure_default_apps() {
 
 # --- sddm theme --------------------------------------------------------
 install_sddm_theme() {
-    if is_wsl; then warn "WSL: skipping SDDM theme."; return 0; fi
     if [[ -d "$SDDM_THEME_DIR" ]]; then
         log "SDDM theme already installed; skipping."
     else
@@ -203,7 +189,6 @@ install_sddm_theme() {
 
 # --- waydroid ----------------------------------------------------------
 setup_waydroid() {
-    if is_wsl; then warn "WSL: skipping waydroid."; return 0; fi
     if ! need_cmd waydroid; then
         warn "waydroid not installed; skipping."
         return 0
