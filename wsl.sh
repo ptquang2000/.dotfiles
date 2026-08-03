@@ -20,8 +20,12 @@
 #                             cargo/npm/pip lists, which are unfiltered.
 #      2. Set the login shell zsh, via chsh. Takes effect the next time
 #                             the distro is launched, not in this shell.
-#      3. Link configs        The subset of the repo that applies here —
-#                             see LINKS below. No /etc links, so sudo is
+#      3. Restore interop     Re-registers the WSLInterop binfmt handler
+#                             that systemd wipes on boot, so .exe files
+#                             stay runnable. See NOTES.
+#      4. Link configs        The subset of the repo that applies here —
+#                             see LINKS below. The only /etc write is the
+#                             binfmt config in step 3; otherwise sudo is
 #                             needed only for the package install.
 #
 #    Every step is idempotent and skipped when it has nothing to do, so
@@ -56,6 +60,14 @@
 #      gives an ordinary, resizable Windows window. Hence sway on the
 #      wlroots headless backend, exported over VNC by wayvnc.
 #    - Everything is software-rendered; there is no /dev/dri here.
+#    - systemd=true costs Windows interop. WSL registers its MZ handler in
+#      binfmt_misc before hand-off, then systemd mounts binfmt_misc over
+#      it and the registration is gone, so every .exe dies with
+#      "exec format error". systemd-binfmt would restore it, but it is
+#      ConditionDirectoryNotEmpty on the binfmt.d dirs and those are empty
+#      out of the box, so the unit never runs. Dropping the handler into
+#      /etc/binfmt.d/ satisfies the condition and makes the fix survive
+#      reboots.
 #    - There is no audio: VNC has no audio channel and
 #      /mnt/wslg/PulseServer is not reachable from that session.
 # =====================================================================
@@ -73,6 +85,13 @@ NPM_FILE="${PKG_DIR}/package.json"
 PIP_FILE="${PKG_DIR}/requirements.txt"
 
 ZSH_BIN="/usr/bin/zsh"
+
+# Windows interop, re-registered for systemd's benefit. The interpreter is
+# /init, WSL's own hand-off binary; P passes the original argv[0] through and
+# F loads the interpreter now rather than at exec time, so it keeps working
+# inside mount namespaces that cannot see /init.
+BINFMT_CONF="/etc/binfmt.d/WSLInterop.conf"
+BINFMT_LINE=":WSLInterop:M::MZ::/init:PF"
 
 FORCE=0
 CHECK_ONLY=0
@@ -163,6 +182,19 @@ login_shell() { getent passwd "$USER" | cut -d: -f7; }
 
 # True while the login shell is still whatever the distro image shipped.
 shell_wrong() { [[ "$(login_shell)" != "$ZSH_BIN" ]]; }
+
+# WSL names the handler WSLInterop, or WSLInterop-late on builds that defer
+# the registration; either one means .exe files run.
+interop_live() {
+    [[ -e /proc/sys/fs/binfmt_misc/WSLInterop ||
+       -e /proc/sys/fs/binfmt_misc/WSLInterop-late ]]
+}
+
+# Wrong when interop is dead now, or alive but with nothing on disk to bring
+# it back after the next boot.
+interop_wrong() {
+    ! interop_live || [[ "$(cat "$BINFMT_CONF" 2>/dev/null)" != "$BINFMT_LINE" ]]
+}
 
 # --- install -----------------------------------------------------------
 # Failures here warn rather than abort: the shell and link steps are
@@ -288,6 +320,38 @@ configure_shell() {
     fi
 }
 
+# --- windows interop ---------------------------------------------------
+# Writes the handler systemd needs and, if it is not already loaded, asks
+# systemd-binfmt to load it so this shell can run .exe files without a
+# distro restart. Reachable only through sudo, so like configure_shell it
+# can be declined and must not be fatal.
+configure_interop() {
+    if [[ "$(cat "$BINFMT_CONF" 2>/dev/null)" != "$BINFMT_LINE" ]]; then
+        log "Registering the WSLInterop binfmt handler in $BINFMT_CONF"
+        if ! as_root install -Dm644 /dev/stdin "$BINFMT_CONF" <<<"$BINFMT_LINE"; then
+            warn "Could not write $BINFMT_CONF; .exe files will stop working on reboot."
+            return 1
+        fi
+    fi
+
+    if interop_live; then
+        ok "Windows interop registered."
+        return 0
+    fi
+
+    if [[ ! -d /run/systemd/system ]]; then
+        warn "Interop is dead and systemd is not running; restart the distro."
+        return 1
+    fi
+
+    if as_root systemctl restart systemd-binfmt && interop_live; then
+        ok "Windows interop restored."
+    else
+        warn "systemd-binfmt did not register the handler; restart the distro."
+        return 1
+    fi
+}
+
 # --- link --------------------------------------------------------------
 # Creates dest -> src, backing up anything already there that is not already
 # the correct symlink. Everything is under $HOME, so no sudo path is needed.
@@ -338,6 +402,10 @@ provision() {
         configure_shell || true
     fi
 
+    if (( FORCE )) || interop_wrong; then
+        configure_interop || true
+    fi
+
     if (( FORCE )) || [[ -n "$unlinked_now" ]]; then
         [[ -n "$unlinked_now" ]] && log "Not linked: $(tr '\n' ' ' <<<"$unlinked_now")"
         link_configs
@@ -362,6 +430,16 @@ report_state() {
         warn "Login shell is $(login_shell), not $ZSH_BIN."
     else
         ok "Login shell is zsh."
+    fi
+
+    if ! interop_live; then
+        warn "Windows interop is dead; .exe files will fail with 'exec format error'."
+        rc=1
+    elif [[ "$(cat "$BINFMT_CONF" 2>/dev/null)" != "$BINFMT_LINE" ]]; then
+        warn "Windows interop works now but $BINFMT_CONF is missing; it will break on reboot."
+        rc=1
+    else
+        ok "Windows interop registered."
     fi
 
     unlinked_now="$(unlinked)"
