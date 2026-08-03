@@ -175,7 +175,4 @@ assign [app_id="zen"] workspace number 1
 assign [app_id="com.mitchellh.ghostty"] workspace number 2
 assign [app_id="virt-manager"] workspace number 3
 
-# A VM console has a fixed aspect ratio and tiles badly.
-for_window [app_id="virt-manager"] floating enable
-
 for_window [title="^([Pp]icture[-\s]in[-\s][Pp]icture)$"] floating enable, sticky enable
