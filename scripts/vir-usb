@@ -1,0 +1,62 @@
+#!/bin/bash
+# USB passthrough for libvirt VMs (works with usbipd-attached devices under WSL).
+# Usage: ./vir-usb COMMAND [ARGS]
+#   list                       list host USB devices as VENDOR:PRODUCT
+#   show      VM               show devices currently passed through to VM
+#   attach    VM VEND:PROD     hand the device to the VM (live)
+#   detach    VM VEND:PROD     give the device back to the host (live)
+
+set -euo pipefail
+
+usage() {
+    echo "usage: $0 {list|show|attach|detach} [VM] [VENDOR:PRODUCT]" >&2
+    exit 1
+}
+
+CMD="${1:-}"
+[ -n "$CMD" ] || usage
+
+VIRSH="sudo virsh -c qemu:///system"
+
+hostdev_xml() {
+    local id="$1"
+    case "$id" in
+    *:*) ;;
+    *)
+        echo "$0: expected VENDOR:PRODUCT (e.g. 0951:1666), got '$id'" >&2
+        exit 1
+        ;;
+    esac
+    cat <<EOF
+<hostdev mode='subsystem' type='usb' managed='yes'>
+  <source>
+    <vendor id='0x${id%:*}'/>
+    <product id='0x${id#*:}'/>
+  </source>
+</hostdev>
+EOF
+}
+
+case "$CMD" in
+list)
+    # Root hubs live at /sys/bus/usb/devices/usbN and are skipped by the glob.
+    for d in /sys/bus/usb/devices/[0-9]*-[0-9]*/; do
+        [ -r "$d/idVendor" ] || continue
+        printf '%s:%s  %s\n' \
+            "$(cat "$d/idVendor")" "$(cat "$d/idProduct")" \
+            "$(cat "$d/product" 2>/dev/null || echo '?')"
+    done
+    ;;
+show)
+    VM="${2:?usage: $0 show VM}"
+    $VIRSH dumpxml "$VM" | sed -n '/<hostdev/,/<\/hostdev>/p'
+    ;;
+attach | detach)
+    VM="${2:?usage: $0 $CMD VM VENDOR:PRODUCT}"
+    ID="${3:?usage: $0 $CMD VM VENDOR:PRODUCT}"
+    hostdev_xml "$ID" | $VIRSH "$CMD-device" "$VM" --live /dev/stdin
+    ;;
+*)
+    usage
+    ;;
+esac
