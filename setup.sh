@@ -195,7 +195,6 @@ configure_default_apps() {
     if [[ "$current_shell" != "/usr/bin/zsh" ]]; then
         chsh -s /usr/bin/zsh
     fi
-    need_cmd xdg-mime && xdg-mime default org.pwmt.zathura.desktop application/pdf
 }
 
 install_sddm_theme() {
@@ -278,7 +277,6 @@ link_configs() {
     link "$DOTS/fcitx5"           "$CONFIG/fcitx5"
     link "$DOTS/ghostty"          "$CONFIG/ghostty"
     link "$DOTS/mpv"              "$CONFIG/mpv"
-    link "$DOTS/zathura"          "$CONFIG/zathura"
     link "$DOTS/sioyek"           "$CONFIG/sioyek"
     link "$DOTS/nvim-init"        "$CONFIG/nvim"
     link "$DOTS/zsh"              "$CONFIG/zsh"

@@ -55,7 +55,6 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 ZSH_BIN="/usr/bin/zsh"
 BINFMT_CONF="/etc/binfmt.d/WSLInterop.conf"
 BINFMT_LINE=":WSLInterop:M::MZ::/init:PF"
-SESSION_CMDS=(sway swaybg wayvnc ghostty)
 
 case "${1:-}" in
     "") ;;
@@ -185,7 +184,6 @@ link() {
 }
 
 link_all() {
-    link "$DOTS/sway"              "$CONFIG/sway"
     link "$DOTS/ghostty"           "$CONFIG/ghostty"
     link "$DOTS/mako"              "$CONFIG/mako"
     link "$DOTS/nvim-init"         "$CONFIG/nvim"
@@ -223,25 +221,12 @@ main() {
     fi
 
     sync_submodules
-
-    local missing=()
-    for cmd in "${SESSION_CMDS[@]}"; do
-        have "$cmd" || missing+=("$cmd")
-    done
-
-    if (( ${#missing[@]} )); then
-        log "Missing: ${missing[*]}"
-        install_packages
-    else
-        ok "Session packages present."
-    fi
-
     set_shell
     fix_interop
     link_all
 
     echo
-    ok "Provisioned. Start the desktop with: sway-session"
+    ok "Provisioned."
 }
 
 main "$@"

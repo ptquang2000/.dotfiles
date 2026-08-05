@@ -216,7 +216,6 @@ hl.bind(
 
 hl.window_rule({ match = { class = "^(zen)$" }, workspace = "1" })
 hl.window_rule({ match = { class = "^(com.mitchellh.ghostty)$" }, workspace = "2" })
-hl.window_rule({ match = { class = "^(org.pwmt.zathura)$" }, workspace = "2" })
 hl.window_rule({ match = { class = "^(sioyek)$" }, workspace = "3" })
 hl.window_rule({ match = { class = "^(Waydroid)$" }, workspace = "4" })
 
