@@ -200,6 +200,21 @@ if ($LASTEXITCODE -ne 0) {
     throw "scoop import failed with exit code $LASTEXITCODE."
 }
 
+Write-Section "Import winget packages"
+$WingetJson = Join-Path $ScriptRoot 'packages\winget.json'
+if (-not (Test-Path -LiteralPath $WingetJson)) {
+    throw "winget.json not found next to this script at: $WingetJson"
+}
+Refresh-Path
+if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+    throw "winget is not available on PATH. Re-run this script in a fresh shell."
+}
+Write-Host "Importing packages from: $WingetJson"
+winget import -i $WingetJson --accept-package-agreements --accept-source-agreements --disable-interactivity
+if ($LASTEXITCODE -ne 0) {
+    throw "winget import failed with exit code $LASTEXITCODE."
+}
+
 'prefs_user.config', 'keys_user.config' | ForEach-Object { New-Item -ItemType HardLink -Force -Path (Join-Path (scoop prefix sioyek) $_) -Value (Join-Path $ScriptRoot "sioyek\$_") | Out-Null }
 
 Write-Host ""

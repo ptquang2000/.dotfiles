@@ -56,7 +56,7 @@ STAMP="$(date +%Y%m%d-%H%M%S)"
 PACMAN_FILE="$PKG_DIR/pacman"
 AUR_FILE="$PKG_DIR/yay"
 CARGO_FILE="$PKG_DIR/cargo"
-NPM_FILE="$PKG_DIR/package.json"
+NPM_FILE="$PKG_DIR/npm.json"
 PIP_FILE="$PKG_DIR/requirements.txt"
 
 SDDM_THEME_DIR="/usr/share/sddm/themes/where_is_my_sddm_theme"

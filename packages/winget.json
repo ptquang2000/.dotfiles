@@ -1,0 +1,12 @@
+{
+    "Sources": [
+        {
+            "Name": "winget"
+        }
+    ],
+    "Packages": [
+        {
+            "PackageIdentifier": "Dorssel.usbipd-win"
+        }
+    ]
+}

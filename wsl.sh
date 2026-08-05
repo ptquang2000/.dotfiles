@@ -113,8 +113,8 @@ install_lang_packages() {
         done
     fi
 
-    if have npm && [[ -r "$PKG/package.json" ]]; then
-        deps="$(node -e "const p=require('$PKG/package.json'); console.log(Object.keys(p.dependencies||{}).join(' '))")"
+    if have npm && [[ -r "$PKG/npm.json" ]]; then
+        deps="$(node -e "const p=require('$PKG/npm.json'); console.log(Object.keys(p.dependencies||{}).join(' '))")"
         [[ -n "$deps" ]] && { as_root npm install -g $deps || warn "npm install failed."; }
     fi
 
