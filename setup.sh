@@ -1,169 +1,102 @@
 #!/usr/bin/env bash
 # =============================================================================
-# setup.sh — Link dotfiles into the appropriate locations on Linux.
+# setup.sh — link this repo's configs into place on bare-metal Arch.
 #
-# Mirrors what setup.bat does for Windows. Creates symlinks from this repo
-# into ~/.config, $HOME, and (with sudo) /etc/... as appropriate.
+#   ./setup.sh            Link everything. Whatever is in the way is backed up
+#                         to <dest>.bak.<timestamp> first.
+#   ./setup.sh --dry-run  Print what would happen and touch nothing.
 #
-# Usage:
-#   ./setup.sh            Apply the configuration (creates symlinks, backs up
-#                         any pre-existing non-symlink targets).
-#   ./setup.sh --dry-run  Print the actions that would be taken without
-#                         touching the filesystem.
+# Re-running is a no-op: links that already point into the repo are left alone.
+# Windows is setup.bat's job; WSL is wsl.sh's, which links a smaller subset and
+# also installs packages.
 #
-# Idempotent: re-running after a successful setup performs no changes and
-# creates no new backups — symlinks that already point at the correct target
-# are left untouched.
+# Deliberately not linked here: powershell/, bucket/, psmux/ (Windows-only),
+# assets/ and packages/ (data, not config).
 # =============================================================================
 
 set -euo pipefail
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+DOTS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
+BIN="$HOME/.local/bin"
+STAMP="$(date +%Y%m%d-%H%M%S)"
 
-DRY_RUN=0
-for arg in "$@"; do
-    case "$arg" in
-        --dry-run|-n) DRY_RUN=1 ;;
-        *)
-            echo "Unknown argument: $arg" >&2
-            exit 2
-            ;;
-    esac
-done
+DRY=0
+case "${1:-}" in
+    --dry-run|-n) DRY=1 ;;
+    -h|--help) sed -n '2,/^# ===/p' "$0" | sed 's/^#\ \?//'; exit 0 ;;
+    "") ;;
+    *) echo "Unknown argument: $1" >&2; exit 2 ;;
+esac
 
-TIMESTAMP="$(date +%Y%m%d-%H%M%S)"
-SUCCESSES=()
-FAILURES=()
-SKIPPED=()
+log() { printf '[setup] %s\n' "$*"; }
 
-# ---- logging helpers --------------------------------------------------------
-
-log()  { printf '[setup] %s\n' "$*"; }
-warn() { printf '[setup][warn] %s\n' "$*" >&2; }
-err()  { printf '[setup][err]  %s\n' "$*" >&2; }
-
-run() {
-    if (( DRY_RUN )); then
-        printf '  DRY: %s\n' "$*"
-    else
-        eval "$@"
-    fi
-}
-
-# ---- core link routine ------------------------------------------------------
-
-# link_into <src> <dest> [label]
-#   Creates a symlink at <dest> pointing to <src>. Backs up any existing
-#   non-symlink target to <dest>.bak.<timestamp>. Skips when the symlink is
-#   already correct. Uses sudo when <dest> is outside $HOME.
-link_into() {
-    local src="$1"
-    local dest="$2"
-    local label="${3:-$(basename "$src")}"
+# link <src> <dest> — point dest at src, backing up anything already there.
+# sudo is used only for destinations outside $HOME.
+link() {
+    local src="$1" dest="$2" sudo=""
+    [[ "$dest" == "$HOME"/* ]] || sudo="sudo"
 
     if [[ ! -e "$src" ]]; then
-        warn "Source missing, skipping: $src"
-        SKIPPED+=("$label (source missing)")
+        log "skip, source missing: $src"
+        return 0
+    fi
+    if [[ "$(readlink "$dest" 2>/dev/null)" == "$src" ]]; then
+        return 0
+    fi
+    if (( DRY )); then
+        log "would link $dest -> $src"
         return 0
     fi
 
-    local sudo_cmd=""
-    case "$dest" in
-        "$HOME"/*|"$HOME") sudo_cmd="" ;;
-        *) sudo_cmd="sudo" ;;
-    esac
-
-    local parent
-    parent="$(dirname "$dest")"
-    if [[ ! -d "$parent" ]]; then
-        run "$sudo_cmd mkdir -p '$parent'"
-    fi
-
-    # Already the correct symlink? Nothing to do.
-    if [[ -L "$dest" ]]; then
-        local current
-        current="$(readlink "$dest" || true)"
-        if [[ "$current" == "$src" ]]; then
-            log "OK (already linked): $dest -> $src"
-            SUCCESSES+=("$label")
-            return 0
-        fi
-    fi
-
-    # Back up anything already at <dest> that isn't the correct symlink.
+    $sudo mkdir -p "$(dirname "$dest")"
     if [[ -e "$dest" || -L "$dest" ]]; then
-        local backup="${dest}.bak.${TIMESTAMP}"
-        log "Backing up existing $dest -> $backup"
-        run "$sudo_cmd mv '$dest' '$backup'"
+        log "backing up $dest -> $dest.bak.$STAMP"
+        $sudo mv "$dest" "$dest.bak.$STAMP"
     fi
-
-    log "Linking $dest -> $src"
-    # -s symbolic, -f force, -n treat dest symlink-to-dir as file (no descent).
-    if run "$sudo_cmd ln -sfn '$src' '$dest'"; then
-        SUCCESSES+=("$label")
-    else
-        err "Failed to link $label"
-        FAILURES+=("$label")
-    fi
+    $sudo ln -sfn "$src" "$dest"
+    log "linked $dest -> $src"
 }
 
-# ---- mappings ---------------------------------------------------------------
-#
-# Folders intentionally skipped on Linux:
-#   powershell/      Windows PowerShell profile (handled by setup.bat)
-#   bucket/          Scoop bucket metadata (Windows-only)
-#   psmux/           PowerShell tmux clone (Windows-only)
-#   assets/          Static assets consumed by other steps, not a config dir
-#   packages/        Package lists consumed by install.sh, not a config dir
-#   opencode/        Contains opencode skills (linked individually below)
-#   .git/ .gitignore .gitmodules install.bat setup.bat install.sh setup.sh README.md
+log "Repo: $DOTS"
+(( DRY )) && log "Dry run; nothing will change."
 
-CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
+# --- ~/.config ---------------------------------------------------------------
+link "$DOTS/hypr"             "$CONFIG/hypr"
+link "$DOTS/waybar"           "$CONFIG/waybar"
+link "$DOTS/mako"             "$CONFIG/mako"
+link "$DOTS/fcitx5"           "$CONFIG/fcitx5"
+link "$DOTS/ghostty"          "$CONFIG/ghostty"
+link "$DOTS/mpv"              "$CONFIG/mpv"
+link "$DOTS/zathura"          "$CONFIG/zathura"
+link "$DOTS/sioyek"           "$CONFIG/sioyek"
+link "$DOTS/nvim-init"        "$CONFIG/nvim"
+link "$DOTS/zsh"              "$CONFIG/zsh"
+link "$DOTS/tmux"             "$CONFIG/tmux"
+link "$DOTS/tmux-sessionizer" "$CONFIG/tmux-sessionizer"
+link "$DOTS/opencode/skills"  "$CONFIG/opencode/skills"
 
-log "Repo root: $SCRIPT_DIR"
-log "Config home: $CONFIG_HOME"
-(( DRY_RUN )) && log "Dry-run mode: no changes will be made."
+# --- $HOME -------------------------------------------------------------------
+link "$DOTS/.zshenv"          "$HOME/.zshenv"
+link "$DOTS/.bashrc"          "$HOME/.bashrc"
 
-# --- ~/.config/* symlinks ----------------------------------------------------
-link_into "$SCRIPT_DIR/hypr"              "$CONFIG_HOME/hypr"              "hypr"
-link_into "$SCRIPT_DIR/waybar"            "$CONFIG_HOME/waybar"            "waybar"
-link_into "$SCRIPT_DIR/mako"              "$CONFIG_HOME/mako"              "mako"
-link_into "$SCRIPT_DIR/fcitx5"            "$CONFIG_HOME/fcitx5"            "fcitx5"
-link_into "$SCRIPT_DIR/ghostty"           "$CONFIG_HOME/ghostty"           "ghostty"
-link_into "$SCRIPT_DIR/mpv"               "$CONFIG_HOME/mpv"               "mpv"
-link_into "$SCRIPT_DIR/zathura"           "$CONFIG_HOME/zathura"           "zathura"
-link_into "$SCRIPT_DIR/sioyek"           "$CONFIG_HOME/sioyek"            "sioyek"
-link_into "$SCRIPT_DIR/nvim-init"         "$CONFIG_HOME/nvim"              "nvim"
-link_into "$SCRIPT_DIR/zsh"               "$CONFIG_HOME/zsh"               "zsh"
-link_into "$SCRIPT_DIR/tmux"              "$CONFIG_HOME/tmux"              "tmux"
-link_into "$SCRIPT_DIR/tmux-sessionizer"  "$CONFIG_HOME/tmux-sessionizer"  "tmux-sessionizer"
-link_into "$SCRIPT_DIR/scripts"           "$HOME/.local/bin"               ".local/bin"
-link_into "$SCRIPT_DIR/opencode/skills"   "$CONFIG_HOME/opencode/skills"   "opencode/skills"
-
-# --- $HOME dotfiles ----------------------------------------------------------
-link_into "$SCRIPT_DIR/.zshenv"           "$HOME/.zshenv"                  ".zshenv"
-link_into "$SCRIPT_DIR/.bashrc"           "$HOME/.bashrc"                  ".bashrc"
-
-# --- system paths (require sudo) --------------------------------------------
-# Note: symlinking a directory from $HOME into /etc works but is fragile when
-# the repo moves. We still use ln -sfn (matching the README) so edits in the
-# repo take effect immediately; users who prefer copies can adjust manually.
-link_into "$SCRIPT_DIR/sddm.conf.d"     "/etc/sddm.conf.d"             "sddm.conf.d (sudo)"
-link_into "$SCRIPT_DIR/systemd/resolved.conf.d" "/etc/systemd/resolved.conf.d" "systemd/resolved.conf.d (sudo)"
-
-# ---- summary ----------------------------------------------------------------
-
-echo
-log "==================== Summary ===================="
-log "Linked / already-correct: ${#SUCCESSES[@]}"
-for s in "${SUCCESSES[@]:-}"; do [[ -n "$s" ]] && printf '  + %s\n' "$s"; done
-if (( ${#SKIPPED[@]} )); then
-    log "Skipped: ${#SKIPPED[@]}"
-    for s in "${SKIPPED[@]}"; do printf '  - %s\n' "$s"; done
+# --- ~/.local/bin ------------------------------------------------------------
+# One link per executable, because the tools come from two directories:
+# scripts/ and the virutils submodule. Older runs made ~/.local/bin a symlink
+# to scripts/; that has to go, or every link below lands inside the repo.
+if [[ -L "$BIN" ]]; then
+    log "replacing the $BIN symlink with a real directory"
+    (( DRY )) || rm -f "$BIN"
 fi
-if (( ${#FAILURES[@]} )); then
-    log "Failures: ${#FAILURES[@]}"
-    for s in "${FAILURES[@]}"; do printf '  ! %s\n' "$s"; done
-    exit 1
-fi
+(( DRY )) || mkdir -p "$BIN"
+for src in "$DOTS"/scripts/* "$DOTS"/virutils/vir*; do
+    link "$src" "$BIN/${src##*/}"
+done
+
+# --- /etc (sudo) -------------------------------------------------------------
+# Symlinked rather than copied so repo edits take effect immediately; the
+# tradeoff is that moving the repo breaks them.
+link "$DOTS/sddm.conf.d"              "/etc/sddm.conf.d"
+link "$DOTS/systemd/resolved.conf.d"  "/etc/systemd/resolved.conf.d"
+
 log "Done."

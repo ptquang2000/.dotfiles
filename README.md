@@ -130,19 +130,18 @@ chmod +x wsl.sh        # first time only
 # skipped when it has nothing to do, so re-running is cheap.
 ./wsl.sh
 
-./wsl.sh --check       # report what is missing, change nothing
-./wsl.sh --force       # re-run every step even if it looks done
+./wsl.sh --force       # reinstall packages even if they look present
 ```
 
-The three steps are independent: a package that fails to build is reported but
+The steps are independent: a package that fails to build is reported but
 does not stop the shell and link steps from running, so a partial failure never
-leaves the host half-set-up. The exit status reflects the state afterwards, so
-a clean exit means the host is fully provisioned. `chsh` only rewrites the
+leaves the host half-set-up. `chsh` only rewrites the
 `/etc/passwd` entry — the new login shell takes effect the next time the distro
 is launched, not in the shell that ran the script.
 
 Starting the desktop is separate. `sway-session` is on `PATH` once `wsl.sh` has
-run, because `scripts/` is linked to `~/.local/bin`:
+run, because every executable in `scripts/` and `virutils/` is linked into
+`~/.local/bin`:
 
 ```bash
 sway-session           # foreground; Ctrl-C ends it

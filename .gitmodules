@@ -31,3 +31,6 @@
 [submodule "tmux-sessionizer/scripts"]
 	path = tmux-sessionizer/scripts
 	url = https://github.com/ThePrimeagen/tmux-sessionizer.git
+[submodule "virutils"]
+	path = virutils
+	url = git@github.com:ptquang2000/virutils
