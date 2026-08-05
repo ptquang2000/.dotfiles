@@ -1,6 +1,9 @@
+# --- toolkits & theming -------------------------------------------------
 adwaita-qt5-git
 adwaita-qt6-git
-cloudflare-warp-bin
-firefox-developer-edition
+
+# --- containers & virtual machines --------------------------------------
 waydroid-script-git
+
+# --- applications -------------------------------------------------------
 zen-browser-bin

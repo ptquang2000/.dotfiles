@@ -1,106 +1,70 @@
 #!/usr/bin/env bash
-# =====================================================================
-#  wsl.sh — provision the WSL workstation.
-#
-#  SYNOPSIS
-#    ./wsl.sh            Install packages, set the login shell, restore
-#                        Windows interop, link configs. Then exit; it
-#                        does not start a session.
-#    ./wsl.sh --force    Reinstall packages even when they look present.
-#
-#  DESCRIPTION
-#    This is the only provisioning script to run on a WSL distro.
-#    install.sh and setup.sh are for bare-metal Arch and must NOT be run
-#    here: they install hyprland, sddm and waydroid, none of which work
-#    in the WSL VM, and they link a desktop config set this host has no
-#    use for. Everything WSL-specific lives in this file, packages/wsl,
-#    sway/ and scripts/sway-session.
-#
-#      1. Packages      packages/wsl, an inclusive list; entries also in
-#                       packages/yay come from the AUR, the rest from the
-#                       repos. Then the cargo/npm/pip lists, unfiltered.
-#      2. Login shell   zsh, via chsh. Takes effect the next time the
-#                       distro is launched, not in this shell.
-#      3. Interop       Re-registers the WSLInterop binfmt handler that
-#                       systemd wipes on boot, so .exe stays runnable.
-#      4. Links         The subset of the repo that applies here. The
-#                       only /etc write is the binfmt config in step 3.
-#
-#    Every step is idempotent and skipped when it has nothing to do, and
-#    none of them can abort the others: a package that fails to build is
-#    reported but the shell and link steps still run.
-#
-#    Starting the desktop is a separate concern, handled by
-#    scripts/sway-session, which is on PATH once this script has run:
-#
-#        sway-session              # foreground; Ctrl-C ends it
-#        sway-session -d           # detached, logging to /tmp/sway.log
-#        sway-session --stop
-#        sway-session -d --port 5901 --bind 127.0.0.1
-#
-#    Then connect TigerVNC Viewer on Windows to localhost:<port>.
-#
-#  NOTES
-#    - WSLg cannot be used for GUI work: its rdprail-shell does not
-#      forward xdg_popup implicit grabs across the RDP boundary, so every
-#      dropdown opens and never dismisses. Running a real compositor
-#      fixes it. Nesting one inside WSLg still leaves RAIL owning the
-#      host window, which Windows cannot move, resize or position; the
-#      headless backend plus a VNC client sidesteps RAIL entirely and
-#      gives an ordinary, resizable Windows window. Hence sway on the
-#      wlroots headless backend, exported over VNC by wayvnc.
-#    - Everything is software-rendered; there is no /dev/dri here.
-#    - systemd=true costs Windows interop. WSL registers its MZ handler in
-#      binfmt_misc before hand-off, then systemd mounts binfmt_misc over
-#      it and the registration is gone, so every .exe dies with
-#      "exec format error". systemd-binfmt would restore it, but it is
-#      ConditionDirectoryNotEmpty on the binfmt.d dirs and those are empty
-#      out of the box, so the unit never runs. Dropping the handler into
-#      /etc/binfmt.d/ satisfies the condition and survives reboots.
-#    - There is no audio: VNC has no audio channel and
-#      /mnt/wslg/PulseServer is not reachable from that session.
-# =====================================================================
 
 set -euo pipefail
-
-DOTS="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PKG="$DOTS/packages"
-CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
-BIN="$HOME/.local/bin"
-STAMP="$(date +%Y%m%d-%H%M%S)"
-
-ZSH_BIN="/usr/bin/zsh"
-
-# Windows interop, re-registered for systemd's benefit. The interpreter is
-# /init, WSL's own hand-off binary; P passes the original argv[0] through and
-# F loads the interpreter now rather than at exec time, so it keeps working
-# inside mount namespaces that cannot see /init.
-BINFMT_CONF="/etc/binfmt.d/WSLInterop.conf"
-BINFMT_LINE=":WSLInterop:M::MZ::/init:PF"
-
-# Present once the package set is installed; their absence is what triggers
-# the install step.
-SESSION_CMDS=(sway swaybg wayvnc ghostty)
-
-FORCE=0
-case "${1:-}" in
-    --force) FORCE=1 ;;
-    -h|--help) sed -n '2,/^# ===/p' "$0" | sed 's/^#\ \?//'; exit 0 ;;
-    "") ;;
-    *) echo "Unknown argument: $1" >&2; exit 2 ;;
-esac
 
 log()  { printf '\033[1;34m[*]\033[0m %s\n' "$*"; }
 warn() { printf '\033[1;33m[!]\033[0m %s\n' "$*" >&2; }
 err()  { printf '\033[1;31m[x]\033[0m %s\n' "$*" >&2; }
 ok()   { printf '\033[1;32m[+]\033[0m %s\n' "$*"; }
 
+REPO_URL="https://github.com/ptquang2000/.dotfiles.git"
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
+
+is_repo() {
+    [[ -f "$1/wsl.sh" && -f "$1/packages/wsl" ]]
+}
+
+bootstrap() {
+    local name="$1"; shift
+    local src_dir
+    src_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-.}")" 2>/dev/null && pwd)"
+
+    if is_repo "$src_dir"; then
+        return 0
+    fi
+
+    if ! command -v git >/dev/null 2>&1; then
+        err "git is required to bootstrap. Install it first: sudo pacman -S git"
+        exit 1
+    fi
+
+    if [[ -e "$DOTFILES_DIR" ]]; then
+        if is_repo "$DOTFILES_DIR" || [[ -d "$DOTFILES_DIR/.git" ]]; then
+            log "Existing dotfiles checkout found: $DOTFILES_DIR"
+        else
+            err "Path exists but is not a dotfiles checkout: $DOTFILES_DIR"
+            exit 1
+        fi
+    else
+        log "Cloning $REPO_URL -> $DOTFILES_DIR"
+        git clone --recurse-submodules "$REPO_URL" "$DOTFILES_DIR"
+    fi
+
+    log "Re-running $name from $DOTFILES_DIR"
+    exec bash "$DOTFILES_DIR/$name" "$@"
+}
+
+bootstrap "wsl.sh" "$@"
+
+DOTS="$(cd -- "$(dirname -- "${BASH_SOURCE[0]:-.}")" && pwd)"
+PKG="$DOTS/packages"
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
+BIN="$HOME/.local/bin"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+
+ZSH_BIN="/usr/bin/zsh"
+BINFMT_CONF="/etc/binfmt.d/WSLInterop.conf"
+BINFMT_LINE=":WSLInterop:M::MZ::/init:PF"
+SESSION_CMDS=(sway swaybg wayvnc ghostty)
+
+case "${1:-}" in
+    "") ;;
+    *) echo "Unknown argument: $1" >&2; exit 2 ;;
+esac
+
 have() { command -v "$1" >/dev/null 2>&1; }
 as_root() { if [[ $EUID -eq 0 ]]; then "$@"; else sudo "$@"; fi; }
 
-# --- packages ----------------------------------------------------------
-# Failures warn rather than abort; the later steps do not depend on them.
-# Membership in packages/yay is what marks an entry as AUR rather than repo.
 pkg_list() { grep -vE '^\s*(#|$)' "$1" 2>/dev/null | sort -u || true; }
 
 install_packages() {
@@ -141,8 +105,6 @@ bootstrap_yay() {
     rm -rf "$build"
 }
 
-# The cargo/npm/pip lists are not WSL-filtered — every entry works here.
-# One entry that fails to build must not take the rest of the run with it.
 install_lang_packages() {
     local item deps
 
@@ -154,7 +116,6 @@ install_lang_packages() {
 
     if have npm && [[ -r "$PKG/package.json" ]]; then
         deps="$(node -e "const p=require('$PKG/package.json'); console.log(Object.keys(p.dependencies||{}).join(' '))")"
-        # shellcheck disable=SC2086
         [[ -n "$deps" ]] && { as_root npm install -g $deps || warn "npm install failed."; }
     fi
 
@@ -165,10 +126,6 @@ install_lang_packages() {
     fi
 }
 
-# --- login shell -------------------------------------------------------
-# chsh authenticates through PAM on its own, separately from the sudo above,
-# so it prompts for a password and can be declined. Nothing else in the repo
-# depends on it, so a refusal is not fatal.
 set_shell() {
     [[ "$(getent passwd "$USER" | cut -d: -f7)" == "$ZSH_BIN" ]] && return 0
     if [[ ! -x "$ZSH_BIN" ]]; then
@@ -184,9 +141,6 @@ set_shell() {
     chsh -s "$ZSH_BIN" || warn "chsh failed or was declined; run 'chsh -s $ZSH_BIN' by hand."
 }
 
-# --- windows interop ---------------------------------------------------
-# WSL names the handler WSLInterop, or WSLInterop-late on builds that defer
-# the registration; either one means .exe files run.
 interop_live() {
     [[ -e /proc/sys/fs/binfmt_misc/WSLInterop ||
        -e /proc/sys/fs/binfmt_misc/WSLInterop-late ]]
@@ -212,10 +166,6 @@ fix_interop() {
     fi
 }
 
-# --- links -------------------------------------------------------------
-# Everything lands under $HOME, so none of this needs sudo. Deliberately
-# absent: hypr and waybar (Hyprland-only), fcitx5, mpv, zathura and sioyek
-# (not in packages/wsl), and the /etc links, which are bare-metal concerns.
 link() {
     local src="$1" dest="$2"
 
@@ -246,10 +196,6 @@ link_all() {
     link "$DOTS/.zshenv"           "$HOME/.zshenv"
     link "$DOTS/.bashrc"           "$HOME/.bashrc"
 
-    # One link per executable, because the tools come from two directories:
-    # scripts/ and the virutils submodule. Older runs made ~/.local/bin a
-    # symlink to scripts/; that has to go, or every link below lands inside
-    # the repo.
     if [[ -L "$BIN" ]]; then
         log "replacing the $BIN symlink with a real directory"
         rm -f "$BIN"
@@ -263,21 +209,28 @@ link_all() {
     ok "Configs and executables linked."
 }
 
-# --- main --------------------------------------------------------------
+sync_submodules() {
+    [[ -f "$DOTS/.gitmodules" && -d "$DOTS/.git" ]] || return 0
+    log "Updating git submodules (recursive)"
+    git -C "$DOTS" submodule update --init --recursive
+}
+
 main() {
     if [[ -z "${WSL_DISTRO_NAME:-}" ]] &&
        ! grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then
-        err "Not running under WSL. On bare metal, use install.sh + setup.sh."
+        err "Not running under WSL. On bare metal, use setup.sh."
         exit 1
     fi
+
+    sync_submodules
 
     local missing=()
     for cmd in "${SESSION_CMDS[@]}"; do
         have "$cmd" || missing+=("$cmd")
     done
 
-    if (( FORCE )) || (( ${#missing[@]} )); then
-        (( ${#missing[@]} )) && log "Missing: ${missing[*]}"
+    if (( ${#missing[@]} )); then
+        log "Missing: ${missing[*]}"
         install_packages
     else
         ok "Session packages present."

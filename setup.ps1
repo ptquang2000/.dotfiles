@@ -53,7 +53,6 @@ function Test-IsJunction {
 function Get-JunctionTarget {
     param([string]$Path)
     $item = Get-Item -LiteralPath $Path -Force
-    # Target is an array on PS 5.1+
     return ($item.Target | Select-Object -First 1)
 }
 
@@ -78,7 +77,6 @@ function New-DotfilesJunction {
                 return
             }
             Write-Host "Removing existing junction/symlink: $Target"
-            # Use cmd rmdir so we delete the junction itself, not its contents.
             & cmd /c rmdir """$Target""" | Out-Null
         } else {
             Write-Host "Removing existing directory: $Target"
@@ -99,7 +97,7 @@ function Test-InDotfilesRepo {
     param([string]$Path)
     if (-not $Path) { return $false }
     if (-not (Test-Path -LiteralPath $Path -PathType Container)) { return $false }
-    $markers = @('setup.ps1', 'install.ps1', 'packages\scoop.json')
+    $markers = @('setup.ps1', 'packages\scoop.json')
     foreach ($m in $markers) {
         if (-not (Test-Path -LiteralPath (Join-Path $Path $m))) { return $false }
     }
@@ -119,6 +117,27 @@ function Sync-Submodules {
     }
 }
 
+function Switch-PersonalSubmoduleRemotes {
+    param([Parameter(Mandatory)][string]$RepoRoot)
+    $remotes = @(
+        @{ Path = 'nvim-init'; Remote = 'git@github.com:ptquang2000/nvim-init.git' }
+        @{ Path = 'powershell'; Remote = 'git@github.com:ptquang2000/powershell.git' }
+        @{ Path = 'virutils'; Remote = 'git@github.com:ptquang2000/virutils.git' }
+    )
+    foreach ($r in $remotes) {
+        $sub = Join-Path $RepoRoot $r.Path
+        if (-not (Test-Path -LiteralPath (Join-Path $sub '.git'))) {
+            Write-Host "Submodule not initialized, skipping: $($r.Path)"
+            continue
+        }
+        $current = & git -C $sub remote get-url origin
+        if ($current -ceq $r.Remote) { continue }
+        & git -C $sub remote set-url origin $r.Remote
+        if ($LASTEXITCODE -ne 0) { throw "Failed to switch submodule remote: $($r.Path)" }
+        Write-Host "Submodule $($r.Path) remote -> $($r.Remote)"
+    }
+}
+
 Write-Section "Install Scoop"
 Install-Scoop
 
@@ -132,6 +151,7 @@ $DotfilesTarget = Join-Path $env:USERPROFILE '.dotfiles'
 if (Test-InDotfilesRepo -Path $ScriptRoot) {
     Write-Host "Running from inside the dotfiles repo: $ScriptRoot"
     Sync-Submodules -RepoRoot $ScriptRoot
+    Switch-PersonalSubmoduleRemotes -RepoRoot $ScriptRoot
 } else {
     if ((Test-Path -LiteralPath (Join-Path $DotfilesTarget '.git')) -or (Test-InDotfilesRepo -Path $DotfilesTarget)) {
         Write-Host "Existing dotfiles clone found at: $DotfilesTarget (skipping clone)"
@@ -165,7 +185,21 @@ foreach ($j in $junctions) {
     New-DotfilesJunction -Source $j.Source -Target $j.Target
 }
 
-# sioyek (scoop portable build) reads config from its own install dir — hardlink our files in.
+Write-Section "Import scoop packages"
+$ScoopJson = Join-Path $ScriptRoot 'packages\scoop.json'
+if (-not (Test-Path -LiteralPath $ScoopJson)) {
+    throw "scoop.json not found next to this script at: $ScoopJson"
+}
+Refresh-Path
+if (-not (Get-Command scoop -ErrorAction SilentlyContinue)) {
+    throw "scoop is not available on PATH. Re-run this script in a fresh shell."
+}
+Write-Host "Importing packages from: $ScoopJson"
+scoop import $ScoopJson
+if ($LASTEXITCODE -ne 0) {
+    throw "scoop import failed with exit code $LASTEXITCODE."
+}
+
 'prefs_user.config', 'keys_user.config' | ForEach-Object { New-Item -ItemType HardLink -Force -Path (Join-Path (scoop prefix sioyek) $_) -Value (Join-Path $ScriptRoot "sioyek\$_") | Out-Null }
 
 Write-Host ""

@@ -6,170 +6,31 @@ bootstrap scripts differ.
 
 # Prerequisites
 
-## Github SSH key
-```bash
-ssh-keygen -t ed25519 -C "ptquang2000@gmail.com"
-eval "$(ssh-agent -s)"
-ssh-add ${HOME}/.ssh/id_ed25519
-cat ${HOME}/.ssh/id_ed25519.pub
-```
-
-## Git global config
-```bash
-git config --global user.email "ptquang2000@gmail.com"
-git config --global user.name "quang.phan"
-```
-
-## Clone and update submodules
-```bash
-git submodule update --init --recursive
-```
-
 # Usage
-
-Both platforms are driven from this same repository; only the bootstrap
-scripts differ. On Windows, run **setup** first (prerequisites + symlinks),
-then **install** (packages). On Linux, run **install** first (system
-packages), then **setup** (symlinks into user-config locations).
 
 ## Windows
 
-Requires PowerShell 5.1+. **No administrator privileges needed** for either
-script — Scoop is installed per-user and `setup.ps1` uses directory
-junctions (no symlink privilege required).
-
-**Fresh machine (one-liner):**
-
-Downloads and runs `setup.ps1` directly from GitHub, which installs Scoop +
-git and then recursively clones this repository into `%USERPROFILE%\.dotfiles`
-before linking configs. **No administrator privileges needed.**
-
 ```powershell
-irm https://raw.githubusercontent.com/ptquang2000/.dotfiles/master/setup.ps1 | iex
-```
-
-If script execution is blocked by policy, use a one-shot bypass (still no
-admin required):
-
-```powershell
-powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/ptquang2000/.dotfiles/master/setup.ps1 | iex"
-```
-
-After `setup.ps1` finishes, `cd` into the cloned repo and run `install.ps1`
-to install packages:
-
-```powershell
-cd $env:USERPROFILE\.dotfiles
-.\install.ps1
-```
-
-**If the repo is already cloned:**
-
-```powershell
-# 1. Install Scoop + git, and link powershell\, nvim-init\, and psmux\ into
-#    their expected Windows locations (Documents\PowerShell,
-#    %LOCALAPPDATA%\nvim, %USERPROFILE%\.config\psmux).
-.\setup.ps1
-
-# 2. Install every package declared in packages\scoop.json (via `scoop import`).
-.\install.ps1
-```
-
-If script execution is blocked by policy, either allow it once per user:
-
-```powershell
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
-```
-
-or invoke each script with a one-shot bypass (no admin, no persistent change):
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\setup.ps1
-powershell -ExecutionPolicy Bypass -File .\install.ps1
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Invoke-RestMethod -Uri https://raw.githubusercontent.com/ptquang2000/.dotfiles/master/setup.ps1 | Invoke-Expression
 ```
 
 ## Linux
 
-Arch Linux only. This repo is for personal use, so there is no distro
-detection, no AUR-helper selection, and no fallback for other
-distributions — `install.sh` assumes pacman + yay.
-
 ```bash
-# Make the scripts executable (first time only)
-chmod +x install.sh setup.sh
-
-# 1. Install system packages (pacman + AUR via yay + cargo crates),
-#    install the SDDM theme, configure default apps (zsh shell, zathura
-#    for PDFs), and run waydroid post-install (init GAPPS, enable
-#    container, install libndk + libhoudini). Requires sudo.
-./install.sh
-
-# 2. Preview what setup.sh would link (no filesystem changes)
-./setup.sh --dry-run
-
-# 3. Link configs into ~/.config, $HOME, and /etc (sudo prompted for
-#    /etc/sddm.conf.d and /etc/systemd/resolved.conf.d). Idempotent: safe
-#    to re-run. Any pre-existing non-symlink targets are backed up to
-#    <path>.bak.<timestamp> before being replaced.
-./setup.sh
+sudo pacman -S curl git
+curl -fsSL https://raw.githubusercontent.com/ptquang2000/.dotfiles/master/setup.sh | bash
 ```
+
+The one-liner clones the repo to `$DOTFILES_DIR` (default `~/.dotfiles`,
+override with an env var) and provisions from there.
 
 ## WSL
 
-`wsl.sh` is the only provisioning script to run on a WSL distro. It installs
-packages, sets the login shell and links configs — it does **not** start a
-session; that is `sway-session`'s job. **Do not run `install.sh` or `setup.sh`
-here**: those are for bare-metal Arch and know nothing about WSL, so they would
-install hyprland, sddm and waydroid and link a desktop config set this host
-cannot use.
-
 ```bash
-chmod +x wsl.sh        # first time only
-
-# Install packages, set the login shell to zsh, link configs. Each step is
-# skipped when it has nothing to do, so re-running is cheap.
-./wsl.sh
-
-./wsl.sh --force       # reinstall packages even if they look present
+sudo pacman -S curl git
+curl -fsSL https://raw.githubusercontent.com/ptquang2000/.dotfiles/master/wsl.sh | bash
 ```
-
-The steps are independent: a package that fails to build is reported but
-does not stop the shell and link steps from running, so a partial failure never
-leaves the host half-set-up. `chsh` only rewrites the
-`/etc/passwd` entry — the new login shell takes effect the next time the distro
-is launched, not in the shell that ran the script.
-
-Starting the desktop is separate. `sway-session` is on `PATH` once `wsl.sh` has
-run, because every executable in `scripts/` and `virutils/` is linked into
-`~/.local/bin`:
-
-```bash
-sway-session           # foreground; Ctrl-C ends it
-sway-session -d        # detached, logging to /tmp/sway.log
-sway-session --stop
-sway-session -d --port 5901 --bind 127.0.0.1
-```
-
-Packages come from `packages/wsl`, an inclusive list — anything absent from it
-is not installed. Entries that also appear in `packages/yay` are fetched from
-the AUR, the rest from the repos; the `cargo`, `package.json` and
-`requirements.txt` lists are used unchanged. Only the repo subset that applies
-to a headless host is linked (sway, ghostty, mako, nvim, zsh, tmux, scripts, …),
-all under `$HOME`, so provisioning needs sudo only for the package install
-itself.
-
-WSLg cannot be used for GUI work: its `rdprail-shell` does not forward
-`xdg_popup` implicit grabs, so every dropdown opens and never dismisses.
-Hence sway on the wlroots headless backend, exported over VNC.
-
-Then connect **TigerVNC Viewer** on Windows to `localhost:5900`, with
-Options → Screen → "Resize remote session to the local window size". The
-client must be TigerVNC — TightVNC and RealVNC do not implement
-`SetDesktopSize`, so the desktop will not fit the window.
-
-The VNC listener is unauthenticated; the WSL VM is NAT'd so it is not
-LAN-visible, but any process on the Windows host can connect. There is no
-audio in the session, and clipboard sharing is plain text only.
 
 # Post-install (Linux)
 
@@ -189,28 +50,29 @@ systemctl enable --now systemd-resolved
 sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
 
+## Github SSH key
+```bash
+ssh-keygen -t ed25519 -C "ptquang2000@gmail.com"
+eval "$(ssh-agent -s)"
+ssh-add ${HOME}/.ssh/id_ed25519
+cat ${HOME}/.ssh/id_ed25519.pub
+```
+
+## Git global config
+```bash
+git config --global user.email "ptquang2000@gmail.com"
+git config --global user.name "quang.phan"
+```
+
+
 ## systemd-boot — dual boot with Windows
-
-If Windows is installed on a **separate EFI System Partition** from Linux,
-systemd-boot's auto-detected "Windows Boot Manager" entry often fails to boot
-because it does not pass the BCD (Boot Configuration Database) path to the
-Windows bootloader.
-
-A helper script is included in this repo:
 
 ```bash
 # Copy bootmgfw.efi + BCD to the systemd-boot ESP and create a loader entry
 sudo ./bin/add-windows-entry
 ```
 
-Reboot — a **Windows** entry will appear in the systemd-boot menu.
-
 ## Manual steps
-
-The only step `install.sh` cannot automate is the waydroid certification,
-which requires a Google Services Framework ID retrieved through a browser
-running inside the waydroid session. After launching waydroid and
-signing in via a browser, run:
 
 ```bash
 sudo waydroid-extras certified

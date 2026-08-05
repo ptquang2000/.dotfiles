@@ -1,63 +1,82 @@
-anki
+# --- shell & CLI -------------------------------------------------------
 aria2
 bc
+fd
+fzf
+jq
+less
+neovim
+opencode
+ripgrep
+tmux
+unzip
+wget
+zip
+zsh
+
+# --- languages & build tools -------------------------------------------
 bear
-bemenu-wayland
 clang
+go
+npm
+python-pipx
+rust
+
+# --- containers & virtual machines --------------------------------------
 dnsmasq
 docker
 docker-buildx
 docker-compose
 edk2-ovmf
-fcitx5-unikey
-fd
-fzf
-ghostty
-gnome-themes-extra
-go
+libvirt
+qemu-desktop
+virt-manager
+waydroid
+
+# --- fonts --------------------------------------------------------------
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+ttf-cascadia-code-nerd
+
+# --- wayland session ----------------------------------------------------
+bemenu-wayland
 grim
 gvfs
 hypridle
 hyprland
 hyprpaper
 hyprpolkitagent
-jq
-less
-libdvdcss
 libnotify
-libvirt
 mako
-mpv
-neovim
-noto-fonts
-noto-fonts-cjk
-noto-fonts-emoji
-npm
-opencode
-python-pipx
-qemu-desktop
+seatd
+slurp
+waybar
+wl-clipboard
+xdg-desktop-portal-hyprland
+
+# --- toolkits & theming -------------------------------------------------
+gnome-themes-extra
 qt5-wayland
 qt6-5compat
 qt6-wayland
-reflector
-ripgrep
-rust
-seatd
+
+# --- input method -------------------------------------------------------
+fcitx5-unikey
+
+# --- applications -------------------------------------------------------
+anki
+ghostty
+libdvdcss
+mpv
 sddm
-slurp
-texlive-basic
-texlive-binextra
-texlive-latex
-texlive-latexextra
-tmux
-ttf-cascadia-code-nerd
-unzip
-virt-manager
+
+# --- documents ----------------------------------------------------------
+# texlive-basic
+# texlive-binextra
+# texlive-latex
+# texlive-latexextra
+
+# --- system -------------------------------------------------------------
+reflector
 vulkan-intel
-waybar
-waydroid
-wget
-wl-clipboard
-xdg-desktop-portal-hyprland
-zip
-zsh

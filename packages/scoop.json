@@ -36,8 +36,7 @@
         },
         {
             "Name": "cmake",
-            "Source": "main",
-            "Version": "3.24.0-rc3"
+            "Source": "main"
         },
         {
             "Name": "docker",
@@ -85,10 +84,6 @@
         },
         {
             "Name": "psmux",
-            "Source": "main"
-        },
-        {
-            "Name": "clink",
             "Source": "main"
         },
         {
