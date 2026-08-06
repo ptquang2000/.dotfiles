@@ -18,6 +18,8 @@ setopt inc_append_history
 setopt share_history
 setopt no_list_ambiguous
 
+fpath+=( "$HOME/.dotfiles/virutils/completions" )
+
 source ~/.config/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh
 source ~/.config/zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh
 source ~/.config/zsh/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
