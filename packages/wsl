@@ -8,6 +8,7 @@ less
 neovim
 opencode
 ripgrep
+rsync
 tmux
 unzip
 wget

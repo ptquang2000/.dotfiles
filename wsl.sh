@@ -200,17 +200,56 @@ link_all() {
     fi
     mkdir -p "$BIN"
     local src
-    for src in "$DOTS"/scripts/* "$DOTS"/virutils/vir*; do
+    for src in "$DOTS"/scripts/*; do
         link "$src" "$BIN/${src##*/}"
     done
 
     ok "Configs and executables linked."
 }
 
+install_virutils() {
+    local installer="$DOTS/virutils/install.sh"
+    [[ -f "$installer" ]] || { warn "virutils installer missing: $installer"; return 0; }
+
+    # zsh/.zshrc already puts the checkout's completions dir on fpath, so the
+    # installer only needs to place the driver on PATH.
+    bash "$installer" --bin "$BIN" --no-completions ||
+        warn "virutils install.sh failed; continuing."
+}
+
 sync_submodules() {
     [[ -f "$DOTS/.gitmodules" && -d "$DOTS/.git" ]] || return 0
     log "Updating git submodules (recursive)"
     git -C "$DOTS" submodule update --init --recursive
+}
+
+set_origin() {
+    local path="$1" remote="$2" label="$3"
+
+    if [[ ! -e "$path/.git" ]]; then
+        warn "not a checkout, skipping: $label"
+        return 0
+    fi
+    [[ "$(git -C "$path" remote get-url origin 2>/dev/null)" == "$remote" ]] && return 0
+
+    git -C "$path" remote set-url origin "$remote" ||
+        { warn "could not set origin for $label"; return 0; }
+    log "$label remote -> $remote"
+}
+
+switch_personal_remotes() {
+    set_origin "$DOTS" "git@github.com:ptquang2000/.dotfiles.git" ".dotfiles"
+
+    local remotes=(
+        "nvim-init|git@github.com:ptquang2000/nvim-init.git"
+        "powershell|git@github.com:ptquang2000/powershell.git"
+        "virutils|git@github.com:ptquang2000/virutils.git"
+    )
+    local entry path remote
+    for entry in "${remotes[@]}"; do
+        path="${entry%%|*}"; remote="${entry##*|}"
+        set_origin "$DOTS/$path" "$remote" "submodule $path"
+    done
 }
 
 main() {
@@ -224,7 +263,9 @@ main() {
     install_packages
     set_shell
     fix_interop
+    switch_personal_remotes
     link_all
+    install_virutils
 
     echo
     ok "Provisioned."

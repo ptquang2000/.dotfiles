@@ -293,12 +293,22 @@ link_configs() {
     fi
     mkdir -p "$BIN"
     local src
-    for src in "$DOTS"/scripts/* "$DOTS"/virutils/vir*; do
+    for src in "$DOTS"/scripts/*; do
         link "$src" "$BIN/${src##*/}"
     done
 
     link "$DOTS/sddm.conf.d"              "/etc/sddm.conf.d"
     link "$DOTS/systemd/resolved.conf.d"  "/etc/systemd/resolved.conf.d"
+}
+
+install_virutils() {
+    local installer="$DOTS/virutils/install.sh"
+    [[ -f "$installer" ]] || { warn "virutils installer missing: $installer"; return 0; }
+
+    # zsh/.zshrc already puts the checkout's completions dir on fpath, so the
+    # installer only needs to place the driver on PATH.
+    bash "$installer" --bin "$BIN" --no-completions ||
+        warn "virutils install.sh failed; continuing."
 }
 
 main() {
@@ -317,6 +327,7 @@ main() {
     setup_waydroid
     switch_personal_submodule_remotes
     link_configs
+    install_virutils
 
     ok "Done."
 }
