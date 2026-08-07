@@ -221,6 +221,7 @@ main() {
     fi
 
     sync_submodules
+    install_packages
     set_shell
     fix_interop
     link_all
