@@ -30,6 +30,7 @@ docker-buildx
 docker-compose
 edk2-ovmf
 libvirt
+ntfs-3g
 qemu-desktop
 virt-manager
 
