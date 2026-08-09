@@ -223,35 +223,6 @@ sync_submodules() {
     git -C "$DOTS" submodule update --init --recursive
 }
 
-set_origin() {
-    local path="$1" remote="$2" label="$3"
-
-    if [[ ! -e "$path/.git" ]]; then
-        warn "not a checkout, skipping: $label"
-        return 0
-    fi
-    [[ "$(git -C "$path" remote get-url origin 2>/dev/null)" == "$remote" ]] && return 0
-
-    git -C "$path" remote set-url origin "$remote" ||
-        { warn "could not set origin for $label"; return 0; }
-    log "$label remote -> $remote"
-}
-
-switch_personal_remotes() {
-    set_origin "$DOTS" "git@github.com:ptquang2000/.dotfiles.git" ".dotfiles"
-
-    local remotes=(
-        "nvim-init|git@github.com:ptquang2000/nvim-init.git"
-        "powershell|git@github.com:ptquang2000/powershell.git"
-        "virutils|git@github.com:ptquang2000/virutils.git"
-    )
-    local entry path remote
-    for entry in "${remotes[@]}"; do
-        path="${entry%%|*}"; remote="${entry##*|}"
-        set_origin "$DOTS/$path" "$remote" "submodule $path"
-    done
-}
-
 main() {
     if [[ -z "${WSL_DISTRO_NAME:-}" ]] &&
        ! grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then
@@ -263,7 +234,6 @@ main() {
     install_packages
     set_shell
     fix_interop
-    switch_personal_remotes
     link_all
     install_virutils
 

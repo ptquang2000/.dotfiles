@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# add-windows-entry — Add a Windows Boot Manager entry to systemd-boot
+# add-windows-entry — Set up Windows booting for systemd-boot
 #
 # Detects the Linux ESP (where systemd-boot lives) and the Windows EFI
 # bootloader.  If they are on different partitions the script copies
@@ -10,13 +10,15 @@ set -euo pipefail
 # Usage
 #   sudo ./bin/add-windows-entry
 #
-# The entry is written to:
-#   $ESP/loader/entries/windows.conf
+# No entry file is written: systemd-boot auto-detects Windows once
+# bootmgfw.efi is on the ESP.  Any leftover windows.conf is removed so it
+# does not show up as a duplicate menu item.
 
 ENTRIES_DIR=
 ESP=
 WIN_ESP=
 WIN_BOOT_DIR=
+WIN_MNT=
 
 # ---------------------------------------------------------------- detect
 
@@ -65,6 +67,25 @@ detect_windows() {
     fi
   done < <(findmnt -t vfat -o TARGET --noheadings 2>/dev/null)
 
+  # Fallback: probe unmounted vfat partitions (e.g. a dedicated Windows
+  # ESP that Linux never mounts).  Mount each read-only and check.
+  local part tmp
+  while IFS= read -r part; do
+    [[ -z "$part" ]] && continue
+    findmnt -n -o TARGET "$part" >/dev/null 2>&1 && continue
+    tmp="$(mktemp -d)"
+    if mount -o ro "$part" "$tmp" 2>/dev/null; then
+      if [[ -f "$tmp/EFI/Microsoft/Boot/bootmgfw.efi" ]]; then
+        WIN_ESP="$part"
+        WIN_BOOT_DIR="$tmp/EFI/Microsoft/Boot"
+        WIN_MNT="$tmp"
+        return 0
+      fi
+      umount "$tmp"
+    fi
+    rmdir "$tmp"
+  done < <(lsblk -n -o PATH,FSTYPE | awk '$2=="vfat"{print $1}')
+
   echo "ERROR: cannot find Windows EFI boot files" >&2
   exit 1
 }
@@ -94,16 +115,21 @@ copy_files() {
   if (( needs_remount )); then
     mount "$WIN_ESP" 2>/dev/null || true
   fi
+
+  # Tear down a temporary probe mount from the unmounted-partition fallback
+  if [[ -n "$WIN_MNT" ]]; then
+    umount "$WIN_MNT" 2>/dev/null || true
+    rmdir "$WIN_MNT" 2>/dev/null || true
+  fi
 }
 
-write_entry() {
-  # Path relative to the ESP root
-  local rel="EFI/Microsoft/Boot/bootmgfw.efi"
-  cat > "$ENTRIES_DIR/windows.conf" <<EOF
-title   Windows
-efi     $rel
-EOF
-  echo "  → wrote $ENTRIES_DIR/windows.conf"
+cleanup_entry() {
+  # systemd-boot auto-detects Windows once bootmgfw.efi is on the ESP, so a
+  # manual windows.conf would show up as a duplicate menu entry. Remove it.
+  if [[ -f "$ENTRIES_DIR/windows.conf" ]]; then
+    rm "$ENTRIES_DIR/windows.conf"
+    echo "  → removed redundant $ENTRIES_DIR/windows.conf"
+  fi
 }
 
 # ----------------------------------------------------------------------
@@ -118,16 +144,13 @@ detect_windows
 echo "  → Windows on: $WIN_ESP"
 
 if [[ "$WIN_ESP" == "$ESP" ]]; then
-  echo ":: Windows shares the same ESP — only creating entry"
+  echo ":: Windows shares the same ESP"
 else
   echo ":: Windows has a separate ESP — copying boot files"
   copy_files
 fi
 
-if [[ -f "$ENTRIES_DIR/windows.conf" ]]; then
-  echo ":: Entry already exists, overwriting"
-fi
-write_entry
+cleanup_entry
 
 echo ""
-echo "Done. Reboot and select \"Windows\" from the systemd-boot menu."
+echo "Done. Windows is auto-detected by systemd-boot — reboot and select it from the menu."

@@ -247,27 +247,6 @@ sync_submodules() {
     git -C "$DOTS" submodule update --init --recursive
 }
 
-switch_personal_submodule_remotes() {
-    local remotes=(
-        "nvim-init|git@github.com:ptquang2000/nvim-init.git"
-        "powershell|git@github.com:ptquang2000/powershell.git"
-        "virutils|git@github.com:ptquang2000/virutils.git"
-    )
-    local entry path remote
-    for entry in "${remotes[@]}"; do
-        path="${entry%%|*}"; remote="${entry##*|}"
-        if [[ ! -e "$DOTS/$path/.git" ]]; then
-            warn "submodule not initialized, skipping: $path"
-            continue
-        fi
-        if [[ "$(git -C "$DOTS/$path" remote get-url origin)" == "$remote" ]]; then
-            continue
-        fi
-        git -C "$DOTS/$path" remote set-url origin "$remote"
-        log "submodule $path remote -> $remote"
-    done
-}
-
 link_configs() {
     log "Linking configs"
 
@@ -325,7 +304,6 @@ main() {
     configure_default_apps
     install_sddm_theme
     setup_waydroid
-    switch_personal_submodule_remotes
     link_configs
     install_virutils
 

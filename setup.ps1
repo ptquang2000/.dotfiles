@@ -117,27 +117,6 @@ function Sync-Submodules {
     }
 }
 
-function Switch-PersonalSubmoduleRemotes {
-    param([Parameter(Mandatory)][string]$RepoRoot)
-    $remotes = @(
-        @{ Path = 'nvim-init'; Remote = 'git@github.com:ptquang2000/nvim-init.git' }
-        @{ Path = 'powershell'; Remote = 'git@github.com:ptquang2000/powershell.git' }
-        @{ Path = 'virutils'; Remote = 'git@github.com:ptquang2000/virutils.git' }
-    )
-    foreach ($r in $remotes) {
-        $sub = Join-Path $RepoRoot $r.Path
-        if (-not (Test-Path -LiteralPath (Join-Path $sub '.git'))) {
-            Write-Host "Submodule not initialized, skipping: $($r.Path)"
-            continue
-        }
-        $current = & git -C $sub remote get-url origin
-        if ($current -ceq $r.Remote) { continue }
-        & git -C $sub remote set-url origin $r.Remote
-        if ($LASTEXITCODE -ne 0) { throw "Failed to switch submodule remote: $($r.Path)" }
-        Write-Host "Submodule $($r.Path) remote -> $($r.Remote)"
-    }
-}
-
 Write-Section "Install Scoop"
 Install-Scoop
 
@@ -151,7 +130,6 @@ $DotfilesTarget = Join-Path $env:USERPROFILE '.dotfiles'
 if (Test-InDotfilesRepo -Path $ScriptRoot) {
     Write-Host "Running from inside the dotfiles repo: $ScriptRoot"
     Sync-Submodules -RepoRoot $ScriptRoot
-    Switch-PersonalSubmoduleRemotes -RepoRoot $ScriptRoot
 } else {
     if ((Test-Path -LiteralPath (Join-Path $DotfilesTarget '.git')) -or (Test-InDotfilesRepo -Path $DotfilesTarget)) {
         Write-Host "Existing dotfiles clone found at: $DotfilesTarget (skipping clone)"

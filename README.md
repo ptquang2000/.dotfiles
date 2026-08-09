@@ -36,11 +36,7 @@ curl -fsSL https://raw.githubusercontent.com/ptquang2000/.dotfiles/master/wsl.sh
 
 ## Enable services
 ```bash
-# slow boot
-systemctl enable --now reflector.service
-# use this instead
 sudo systemctl enable --now reflector.timer
-
 sudo timedatectl set-timezone Asia/Bangkok
 
 # require graphical-session???
