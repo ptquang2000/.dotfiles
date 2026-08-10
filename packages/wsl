@@ -10,6 +10,7 @@ neovim
 opencode
 ripgrep
 rsync
+socat
 tmux
 unzip
 wget
