@@ -72,6 +72,9 @@ function mnml_cwd {
 }
 
 function mnml_git {
+    # drvfs (/mnt/c, ...) crosses into Windows per stat, so git here costs seconds
+    [[ "$PWD" == /mnt/* ]] && return
+
     local statc="%{\e[38;2;211;134;155m%}" # assume clean
     local bname="$(git rev-parse --abbrev-ref HEAD 2> /dev/null)"
 
