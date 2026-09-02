@@ -193,6 +193,7 @@ link_all() {
     link "$DOTS/opencode/skills"   "$CONFIG/opencode/skills"
     link "$DOTS/.zshenv"           "$HOME/.zshenv"
     link "$DOTS/.bashrc"           "$HOME/.bashrc"
+    link "$DOTS/gdb"               "$CONFIG/gdb"
 
     if [[ -L "$BIN" ]]; then
         log "replacing the $BIN symlink with a real directory"
