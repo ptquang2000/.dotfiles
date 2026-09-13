@@ -208,16 +208,6 @@ link_all() {
     ok "Configs and executables linked."
 }
 
-install_virutils() {
-    local installer="$DOTS/virutils/install.sh"
-    [[ -f "$installer" ]] || { warn "virutils installer missing: $installer"; return 0; }
-
-    # zsh/.zshrc already puts the checkout's completions dir on fpath, so the
-    # installer only needs to place the driver on PATH.
-    bash "$installer" --bin "$BIN" --no-completions ||
-        warn "virutils install.sh failed; continuing."
-}
-
 sync_submodules() {
     [[ -f "$DOTS/.gitmodules" && -d "$DOTS/.git" ]] || return 0
     log "Updating git submodules (recursive)"
@@ -236,7 +226,6 @@ main() {
     set_shell
     fix_interop
     link_all
-    install_virutils
 
     echo
     ok "Provisioned."

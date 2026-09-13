@@ -45,7 +45,7 @@ systemctl --user enable --now waybar.service
 systemctl enable --now systemd-resolved
 sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 
-# libvirt, for virutils
+# libvirt
 sudo systemctl enable --now virtqemud.socket virtqemud-ro.socket \
 	virtqemud-admin.socket virtnetworkd.socket virtstoraged.socket \
 	virtnodedevd.socket virtsecretd.socket virtinterfaced.socket

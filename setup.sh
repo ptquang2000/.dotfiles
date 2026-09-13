@@ -281,16 +281,6 @@ link_configs() {
     link "$DOTS/systemd/resolved.conf.d"  "/etc/systemd/resolved.conf.d"
 }
 
-install_virutils() {
-    local installer="$DOTS/virutils/install.sh"
-    [[ -f "$installer" ]] || { warn "virutils installer missing: $installer"; return 0; }
-
-    # zsh/.zshrc already puts the checkout's completions dir on fpath, so the
-    # installer only needs to place the driver on PATH.
-    bash "$installer" --bin "$BIN" --no-completions ||
-        warn "virutils install.sh failed; continuing."
-}
-
 main() {
     require_sudo
     log "Repo: $DOTS"
@@ -306,7 +296,6 @@ main() {
     install_sddm_theme
     setup_waydroid
     link_configs
-    install_virutils
 
     ok "Done."
 }
