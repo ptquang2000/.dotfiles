@@ -18,6 +18,10 @@ setopt inc_append_history
 setopt share_history
 setopt no_list_ambiguous
 
+# where install.sh links _virutil; zsh-autocomplete below runs compinit, so
+# this has to come first
+fpath+=( "${XDG_DATA_HOME:-$HOME/.local/share}/zsh/site-functions" )
+
 source ~/.config/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.plugin.zsh
 source ~/.config/zsh/zsh-history-substring-search/zsh-history-substring-search.plugin.zsh
 source ~/.config/zsh/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
