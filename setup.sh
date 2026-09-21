@@ -278,7 +278,46 @@ link_configs() {
     done
 
     link "$DOTS/sddm.conf.d"              "/etc/sddm.conf.d"
-    link "$DOTS/systemd/resolved.conf.d"  "/etc/systemd/resolved.conf.d"
+    install_resolved_conf
+}
+
+install_resolved_conf() {
+    # systemd-resolved runs with ProtectHome=yes and as user systemd-resolve,
+    # so config files under /home are invisible to it. Drop-ins must be copied
+    # into a real /etc directory -- never symlinked into ~/.dotfiles.
+    local src="$DOTS/systemd/resolved.conf.d"
+    local dest="/etc/systemd/resolved.conf.d"
+    local changed=0 f
+
+    [[ -d "$src" ]] || { warn "resolved drop-in dir missing: $src"; return 0; }
+
+    if [[ -L "$dest" ]]; then
+        log "converting $dest symlink to a real directory (backup: $dest.bak.$STAMP)"
+        as_root mv "$dest" "$dest.bak.$STAMP"
+        changed=1
+    elif [[ -e "$dest" && ! -d "$dest" ]]; then
+        warn "$dest exists but is not a directory; backing it up"
+        as_root mv "$dest" "$dest.bak.$STAMP"
+        changed=1
+    fi
+
+    as_root mkdir -p "$dest"
+
+    for f in "$src"/*.conf; do
+        [[ -f "$f" ]] || continue
+        if [[ ! -e "$dest/${f##*/}" ]] || ! cmp -s "$f" "$dest/${f##*/}"; then
+            as_root install -m 644 "$f" "$dest/${f##*/}"
+            log "installed $dest/${f##*/}"
+            changed=1
+        fi
+    done
+
+    if (( changed )); then
+        as_root systemctl restart systemd-resolved
+        ok "systemd-resolved restarted with new DNS drop-ins"
+    else
+        log "systemd-resolved drop-ins already up to date"
+    fi
 }
 
 main() {
