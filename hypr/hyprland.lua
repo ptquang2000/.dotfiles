@@ -10,7 +10,7 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" 
 
 local terminal = "ghostty"
 local menu = 'bemenu-run --fn "CaskaydiaCove Nerd Font" --hp 6 w'
-local browser = "google-chrome"
+local browser = "google-chrome-stable"
 
 -- #############################
 -- ### ENVIRONMENT VARIABLES ###
@@ -29,18 +29,18 @@ hl.env("QT_QPA_PLATFORMTHEME", "qt5ct")
 -- #################
 
 hl.on("hyprland.start", function()
-	hl.exec_cmd("fcitx5 -d -r")
-	hl.exec_cmd("hypridle")
-	hl.exec_cmd("hyprpaper")
-	hl.exec_cmd("mako")
-	hl.exec_cmd("waybar")
-	hl.exec_cmd([[gsettings set org.gnome.desktop.interface gtk-theme "Adwaita:Dark"]])
-	hl.exec_cmd([[gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark']])
-	hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Work")
-	hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Downloads")
-	hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Pictures/Screenshots")
-	hl.exec_cmd("ghostty")
-	hl.exec_cmd("google-chrome")
+  hl.exec_cmd("fcitx5 -d -r")
+  hl.exec_cmd("hypridle")
+  hl.exec_cmd("hyprpaper")
+  hl.exec_cmd("mako")
+  hl.exec_cmd("waybar")
+  hl.exec_cmd([[gsettings set org.gnome.desktop.interface gtk-theme "Adwaita:Dark"]])
+  hl.exec_cmd([[gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark']])
+  hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Work")
+  hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Downloads")
+  hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Pictures/Screenshots")
+  hl.exec_cmd("ghostty")
+  hl.exec_cmd("google-chrome-stable")
 end)
 
 -- #####################
@@ -48,44 +48,44 @@ end)
 -- #####################
 
 hl.config({
-	general = {
-		gaps_in = 0,
-		gaps_out = 0,
-		border_size = 0,
-		col = {
-			active_border = { colors = { "rgb(1d2021)" }, angle = 45 },
-			inactive_border = "rgb(1d2021)",
-		},
-		resize_on_border = true,
-		allow_tearing = false,
-		layout = "dwindle",
-	},
+  general = {
+    gaps_in = 0,
+    gaps_out = 0,
+    border_size = 0,
+    col = {
+      active_border = { colors = { "rgb(1d2021)" }, angle = 45 },
+      inactive_border = "rgb(1d2021)",
+    },
+    resize_on_border = true,
+    allow_tearing = false,
+    layout = "dwindle",
+  },
 })
 
 hl.config({
-	decoration = {
-		rounding = 0,
-		active_opacity = 1.0,
-		inactive_opacity = 1.0,
-		shadow = {
-			enabled = true,
-			range = 4,
-			color = "rgba(1a1a1aee)",
-			render_power = 3,
-		},
-		blur = {
-			enabled = true,
-			size = 8,
-			passes = 2,
-			vibrancy = 0.1696,
-		},
-	},
+  decoration = {
+    rounding = 0,
+    active_opacity = 1.0,
+    inactive_opacity = 1.0,
+    shadow = {
+      enabled = true,
+      range = 4,
+      color = "rgba(1a1a1aee)",
+      render_power = 3,
+    },
+    blur = {
+      enabled = true,
+      size = 8,
+      passes = 2,
+      vibrancy = 0.1696,
+    },
+  },
 })
 
 hl.config({
-	animations = {
-		enabled = false,
-	},
+  animations = {
+    enabled = false,
+  },
 })
 
 hl.curve("myBezier", { type = "bezier", points = { { 0.05, 0.9 }, { 0.1, 1.05 } } })
@@ -98,23 +98,23 @@ hl.animation({ leaf = "fade", enabled = true, speed = 7, bezier = "default" })
 hl.animation({ leaf = "workspaces", enabled = true, speed = 6, bezier = "default" })
 
 hl.config({
-	dwindle = {
-		preserve_split = true,
-		force_split = 2,
-	},
+  dwindle = {
+    preserve_split = true,
+    force_split = 2,
+  },
 })
 
 hl.config({
-	master = {
-		new_status = "master",
-	},
+  master = {
+    new_status = "master",
+  },
 })
 
 hl.config({
-	misc = {
-		force_default_wallpaper = 0,
-		disable_hyprland_logo = true,
-	},
+  misc = {
+    force_default_wallpaper = 0,
+    disable_hyprland_logo = true,
+  },
 })
 
 -- #############
@@ -122,24 +122,24 @@ hl.config({
 -- #############
 
 hl.config({
-	input = {
-		kb_layout = "us",
-		kb_variant = "",
-		kb_model = "",
-		kb_options = "",
-		kb_rules = "",
-		follow_mouse = 1,
-		accel_profile = "adaptive",
-		sensitivity = 0,
-		touchpad = {
-			natural_scroll = false,
-		},
-	},
+  input = {
+    kb_layout = "us",
+    kb_variant = "",
+    kb_model = "",
+    kb_options = "",
+    kb_rules = "",
+    follow_mouse = 1,
+    accel_profile = "adaptive",
+    sensitivity = 0,
+    touchpad = {
+      natural_scroll = false,
+    },
+  },
 })
 
 hl.device({
-	name = "epic-mouse-v1",
-	sensitivity = -0.5,
+  name = "epic-mouse-v1",
+  sensitivity = -0.5,
 })
 
 -- ###################
@@ -161,13 +161,13 @@ hl.bind(mainMod .. " + K", hl.dsp.focus({ direction = "up" }))
 hl.bind(mainMod .. " + J", hl.dsp.focus({ direction = "down" }))
 
 for i = 1, 10 do
-	local k = i % 10
-	hl.bind(mainMod .. " + " .. k, hl.dsp.focus({ workspace = i }))
+  local k = i % 10
+  hl.bind(mainMod .. " + " .. k, hl.dsp.focus({ workspace = i }))
 end
 
 for i = 1, 10 do
-	local k = i % 10
-	hl.bind(mainMod .. " + SHIFT + " .. k, hl.dsp.window.move({ workspace = i }))
+  local k = i % 10
+  hl.bind(mainMod .. " + SHIFT + " .. k, hl.dsp.window.move({ workspace = i }))
 end
 
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
@@ -177,35 +177,35 @@ hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 
 local wpvol =
-	[[export volume=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print ($2 * 100) / 1}' | bc) && notify-send -t 1000 -a 'wp-vol' -h int:value:$volume "Volume: ${volume}%"]]
+[[export volume=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print ($2 * 100) / 1}' | bc) && notify-send -t 1000 -a 'wp-vol' -h int:value:$volume "Volume: ${volume}%"]]
 
 hl.bind(
-	"XF86AudioRaiseVolume",
-	hl.dsp.exec_cmd("pactl set-sink-volume @DEFAULT_SINK@ +5% && " .. wpvol),
-	{ locked = true, repeating = true }
+  "XF86AudioRaiseVolume",
+  hl.dsp.exec_cmd("pactl set-sink-volume @DEFAULT_SINK@ +5% && " .. wpvol),
+  { locked = true, repeating = true }
 )
 hl.bind(
-	"XF86AudioLowerVolume",
-	hl.dsp.exec_cmd("pactl set-sink-volume @DEFAULT_SINK@ -5% && " .. wpvol),
-	{ locked = true, repeating = true }
+  "XF86AudioLowerVolume",
+  hl.dsp.exec_cmd("pactl set-sink-volume @DEFAULT_SINK@ -5% && " .. wpvol),
+  { locked = true, repeating = true }
 )
 hl.bind(
-	"XF86AudioMute",
-	hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ toggle"),
-	{ locked = true, repeating = true }
+  "XF86AudioMute",
+  hl.dsp.exec_cmd("pactl set-sink-mute @DEFAULT_SINK@ toggle"),
+  { locked = true, repeating = true }
 )
 hl.bind(
-	"XF86AudioMicMute",
-	hl.dsp.exec_cmd("pactl set-source-mute @DEFAULT_SOURCE@ toggle"),
-	{ locked = true, repeating = true }
+  "XF86AudioMicMute",
+  hl.dsp.exec_cmd("pactl set-source-mute @DEFAULT_SOURCE@ toggle"),
+  { locked = true, repeating = true }
 )
 
 -- Screenshot
 hl.bind(
-	mainMod .. " + SHIFT + S",
-	hl.dsp.exec_cmd(
-		[[export sspath="${HOME}/Pictures/Screenshots/$(date +'%Y%m%d_%H%M%S_grim.png')" && grim -g "$(slurp)" "$sspath" && wl-copy < "$sspath" && [ "$(notify-send -a screenshot -A default=Open -t 5000 'Screenshot' "$sspath")" = default ] && sioyek --new-window "$sspath"]]
-	)
+  mainMod .. " + SHIFT + S",
+  hl.dsp.exec_cmd(
+    [[export sspath="${HOME}/Pictures/Screenshots/$(date +'%Y%m%d_%H%M%S_grim.png')" && grim -g "$(slurp)" "$sspath" && wl-copy < "$sspath" && [ "$(notify-send -a screenshot -A default=Open -t 5000 'Screenshot' "$sspath")" = default ] && sioyek --new-window "$sspath"]]
+  )
 )
 
 -- ##############################
