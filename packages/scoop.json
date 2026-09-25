@@ -123,7 +123,7 @@
             "Source": "main"
         },
         {
-            "Name": "zen-browser",
+            "Name": "googlechrome",
             "Source": "extras"
         },
         {

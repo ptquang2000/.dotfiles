@@ -6,5 +6,12 @@ adwaita-qt6-git
 waydroid-script-git
 
 # --- applications -------------------------------------------------------
-zen-browser-bin
+gimp
+google-chrome
 sioyek-git
+
+# --- command line & documentation ---------------------------------------
+calc
+man-db
+man-pages
+tldr

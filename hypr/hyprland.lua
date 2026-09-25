@@ -10,7 +10,7 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" 
 
 local terminal = "ghostty"
 local menu = 'bemenu-run --fn "CaskaydiaCove Nerd Font" --hp 6 w'
-local browser = "zen-browser"
+local browser = "google-chrome"
 
 -- #############################
 -- ### ENVIRONMENT VARIABLES ###
@@ -40,7 +40,7 @@ hl.on("hyprland.start", function()
 	hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Downloads")
 	hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Pictures/Screenshots")
 	hl.exec_cmd("ghostty")
-	hl.exec_cmd("zen-browser")
+	hl.exec_cmd("google-chrome")
 end)
 
 -- #####################
@@ -146,7 +146,7 @@ hl.device({
 -- ### KEYBINDINGS ###
 -- ###################
 
-local mainMod = "ALT"
+local mainMod = "SUPER"
 
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(browser))
@@ -212,7 +212,7 @@ hl.bind(
 -- ### WINDOWS AND WORKSPACES ###
 -- ##############################
 
-hl.window_rule({ match = { class = "^(zen)$" }, workspace = "1" })
+hl.window_rule({ match = { class = "^(google-chrome)$" }, workspace = "1" })
 hl.window_rule({ match = { class = "^(com.mitchellh.ghostty)$" }, workspace = "2" })
 
 hl.window_rule({ match = { class = ".*" }, suppress_event = "maximize" })
