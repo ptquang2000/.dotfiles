@@ -215,10 +215,13 @@ hl.bind(
 hl.window_rule({ match = { class = "^(google-chrome)$" }, workspace = "1" })
 hl.window_rule({ match = { class = "^(com.mitchellh.ghostty)$" }, workspace = "2" })
 
+hl.window_rule({ match = { title = "^([Pp]icture[\\-\\s]in[\\-\\s][Pp]icture)$" }, float = true, pin = true })
+hl.window_rule({
+  name = "mpv",
+  match = { class = "^(mpv)$" },
+  workspace = "emptynm",
+  float = true,
+  content = "none",
+})
+
 hl.window_rule({ match = { class = ".*" }, suppress_event = "maximize" })
-
-hl.window_rule({ match = { title = "^([Pp]icture[\\-\\s]in[\\-\\s][Pp]icture)$" }, float = true })
-hl.window_rule({ match = { title = "^([Pp]icture[\\-\\s]in[\\-\\s][Pp]icture)$" }, pin = true })
-
-hl.window_rule({ match = { class = "^(mpv)$" }, float = true })
-hl.window_rule({ match = { class = "^(mpv)$" }, content = "none" })
