@@ -73,12 +73,12 @@ hl.config({
       color = "rgba(1a1a1aee)",
       render_power = 3,
     },
-    blur = {
-      enabled = true,
-      size = 8,
-      passes = 2,
-      vibrancy = 0.1696,
-    },
+    -- blur = {
+    --   enabled = true,
+    --   size = 8,
+    --   passes = 2,
+    --   vibrancy = 0.1696,
+    -- },
   },
 })
 
