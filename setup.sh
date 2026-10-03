@@ -278,46 +278,66 @@ link_configs() {
     done
 
     link "$DOTS/sddm.conf.d"              "/etc/sddm.conf.d"
-    install_resolved_conf
+
+    # No /etc/systemd/resolved.conf.d drop-ins are managed here, deliberately.
+    # systemd-resolved needs none to work, and a Global DNS= drop-in breaks
+    # `warp-cli mode warp`: warp-svc hands DNS to its proxy on 127.0.2.2, Global
+    # resolvers (especially DNSOverTLS=yes) make resolved bypass that handover,
+    # and warp-svc then fails its post-connect probe for connectivity-check.warp-svc
+    # with FailedConnectivityCheck(DNSLookupFailed). Per-interface resolvers go in
+    # NetworkManager instead.
 }
 
-install_resolved_conf() {
-    # systemd-resolved runs with ProtectHome=yes and as user systemd-resolve,
-    # so config files under /home are invisible to it. Drop-ins must be copied
-    # into a real /etc directory -- never symlinked into ~/.dotfiles.
-    local src="$DOTS/systemd/resolved.conf.d"
-    local dest="/etc/systemd/resolved.conf.d"
-    local changed=0 f
+setup_system_services() {
+    log "Setting up system services and networking"
 
-    [[ -d "$src" ]] || { warn "resolved drop-in dir missing: $src"; return 0; }
-
-    if [[ -L "$dest" ]]; then
-        log "converting $dest symlink to a real directory (backup: $dest.bak.$STAMP)"
-        as_root mv "$dest" "$dest.bak.$STAMP"
-        changed=1
-    elif [[ -e "$dest" && ! -d "$dest" ]]; then
-        warn "$dest exists but is not a directory; backing it up"
-        as_root mv "$dest" "$dest.bak.$STAMP"
-        changed=1
+    if need_cmd reflector; then
+        as_root systemctl enable --now reflector.timer 2>/dev/null || warn "Failed to enable reflector.timer"
     fi
 
-    as_root mkdir -p "$dest"
+    if need_cmd timedatectl; then
+        as_root timedatectl set-timezone Asia/Bangkok 2>/dev/null || warn "Failed to set timezone"
+    fi
 
-    for f in "$src"/*.conf; do
-        [[ -f "$f" ]] || continue
-        if [[ ! -e "$dest/${f##*/}" ]] || ! cmp -s "$f" "$dest/${f##*/}"; then
-            as_root install -m 644 "$f" "$dest/${f##*/}"
-            log "installed $dest/${f##*/}"
-            changed=1
+    as_root systemctl enable --now systemd-resolved 2>/dev/null || warn "Failed to enable systemd-resolved"
+    if [[ "$(readlink -f /etc/resolv.conf 2>/dev/null)" != "/run/systemd/resolve/stub-resolv.conf" ]]; then
+        as_root ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf 2>/dev/null || warn "Failed to set resolv.conf stub symlink"
+    fi
+
+    local active_iface
+    active_iface="$(ip route 2>/dev/null | awk '/^default/ {print $5; exit}')"
+    if [[ -n "$active_iface" ]] && need_cmd resolvectl; then
+        resolvectl dns "$active_iface" 9.9.9.9 1.1.1.1 8.8.8.8 >/dev/null 2>&1 || warn "Failed to set per-interface DNS for $active_iface"
+    fi
+
+    if need_cmd systemctl && systemctl list-unit-files 2>/dev/null | grep -q '^virtqemud.socket'; then
+        as_root systemctl enable --now virtqemud.socket virtqemud-ro.socket \
+            virtqemud-admin.socket virtnetworkd.socket virtstoraged.socket \
+            virtnodedevd.socket virtsecretd.socket virtinterfaced.socket 2>/dev/null || warn "Failed to enable libvirt sockets"
+        if ! id -nG "$USER" 2>/dev/null | grep -qw libvirt; then
+            as_root usermod -aG libvirt "$USER" 2>/dev/null || warn "Failed to add $USER to libvirt group"
         fi
-    done
-
-    if (( changed )); then
-        as_root systemctl restart systemd-resolved
-        ok "systemd-resolved restarted with new DNS drop-ins"
-    else
-        log "systemd-resolved drop-ins already up to date"
+        if ! id -nG "$USER" 2>/dev/null | grep -qw docker; then
+            as_root usermod -aG docker "$USER" 2>/dev/null || warn "Failed to add $USER to docker group"
+        fi
+        if need_cmd virsh; then
+            virsh --connect qemu:///system net-autostart default >/dev/null 2>&1 || warn "Failed to autostart libvirt default network"
+            virsh --connect qemu:///system net-start default >/dev/null 2>&1 || true
+        fi
     fi
+
+    # docker
+    if need_cmd systemctl && systemctl list-unit-files 2>/dev/null | grep -q '^docker.socket'; then
+        as_root systemctl enable --now docker.socket 2>/dev/null || warn "Failed to enable docker.socket"
+        as_root systemctl enable --now docker.service 2>/dev/null || warn "Failed to enable docker.service"
+    fi
+
+    if need_cmd warp-cli; then
+        warp-cli --accept-tos mode warp >/dev/null 2>&1 || warn "Failed to set WARP mode to warp"
+        warp-cli --accept-tos connect >/dev/null 2>&1 || warn "Failed to connect WARP"
+    fi
+
+    ok "System services configured"
 }
 
 main() {
@@ -334,6 +354,7 @@ main() {
     configure_default_apps
     install_sddm_theme
     setup_waydroid
+    setup_system_services
     link_configs
 
     ok "Done."

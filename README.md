@@ -34,24 +34,17 @@ curl -fsSL https://raw.githubusercontent.com/ptquang2000/.dotfiles/master/wsl.sh
 
 # Post-install (Linux)
 
-## Enable services
+`setup.sh` now enables reflector, sets the timezone, configures systemd-resolved
+with a stub symlink, sets per-interface DNS (if an active interface is found),
+enables libvirt sockets, adds `$USER` to the `libvirt` group, starts the default
+libvirt network and connects Cloudflare WARP (`mode warp`). To verify after
+boot:
+
 ```bash
-sudo systemctl enable --now reflector.timer
-sudo timedatectl set-timezone Asia/Bangkok
-
-# require graphical-session???
-systemctl --user enable --now waybar.service
-
-systemctl enable --now systemd-resolved
-sudo ln -sf ../run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
-
-# libvirt
-sudo systemctl enable --now virtqemud.socket virtqemud-ro.socket \
-	virtqemud-admin.socket virtnetworkd.socket virtstoraged.socket \
-	virtnodedevd.socket virtsecretd.socket virtinterfaced.socket
-sudo usermod -aG libvirt "$USER"
-virsh --connect qemu:///system net-autostart default
-virsh --connect qemu:///system net-start default
+resolvectl status   # Global must stay empty; active interface shows your resolvers
+warp-cli status
+warp-cli dns stats
+warp-cli dns default-fallbacks
 ```
 
 ## Github SSH key
