@@ -241,6 +241,20 @@ setup_waydroid() {
     warn "Manual step remaining: run 'sudo waydroid-extras certified' after launching a browser inside waydroid."
 }
 
+setup_git_gh() {
+    if ! need_cmd gh; then
+        warn "gh not found; skipping 'gh auth setup-git'."
+        return 0
+    fi
+    if ! gh auth status >/dev/null 2>&1; then
+        warn "gh is not logged in; skipping 'gh auth setup-git'. Run 'gh auth login' first."
+        return 0
+    fi
+    log "Configuring git credential helper for GitHub"
+    gh auth setup-git
+    ok "Configured git to authenticate github.com via the GitHub CLI."
+}
+
 sync_submodules() {
     [[ -f "$DOTS/.gitmodules" && -d "$DOTS/.git" ]] || return 0
     log "Updating git submodules (recursive)"
@@ -351,6 +365,7 @@ main() {
     install_cargo_crates
     install_npm_packages
     install_pip_packages
+    setup_git_gh
     configure_default_apps
     install_sddm_theme
     setup_waydroid

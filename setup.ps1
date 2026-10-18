@@ -201,6 +201,21 @@ if ($LASTEXITCODE -ne 0) {
 
 'prefs_user.config', 'keys_user.config' | ForEach-Object { New-Item -ItemType HardLink -Force -Path (Join-Path (scoop prefix sioyek) $_) -Value (Join-Path $ScriptRoot "sioyek\$_") | Out-Null }
 
+Write-Section "Configure git credential helper for GitHub"
+Refresh-Path
+if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
+    Write-Warning "gh not found on PATH; skipping 'gh auth setup-git'."
+} else {
+    & gh auth status *> $null
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "gh is not logged in; skipping 'gh auth setup-git'. Run 'gh auth login' first."
+    } else {
+        & gh auth setup-git
+        if ($LASTEXITCODE -ne 0) { throw "gh auth setup-git failed with exit code $LASTEXITCODE." }
+        Write-Host "Configured git to authenticate github.com via the GitHub CLI."
+    }
+}
+
 Write-Section "Set hardware clock to UTC (dual-boot fix)"
 $regKey = 'HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation'
 if (Test-IsAdmin) {
