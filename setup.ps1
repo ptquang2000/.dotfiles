@@ -202,14 +202,13 @@ if ($LASTEXITCODE -ne 0) {
 'prefs_user.config', 'keys_user.config' | ForEach-Object { New-Item -ItemType HardLink -Force -Path (Join-Path (scoop prefix sioyek) $_) -Value (Join-Path $ScriptRoot "sioyek\$_") | Out-Null }
 
 Write-Section "Set hardware clock to UTC (dual-boot fix)"
-$tsKey = 'HKLM:\SYSTEM\CurrentControlSet\Control\TimeZoneInformation'
-$regEnv = 'reg.exe'
+$regKey = 'HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation'
 if (Test-IsAdmin) {
-    & $regEnv add "$tsKey" /v RealTimeIsUniversal /t REG_QWORD /d 1 /f | Out-Null
+    & reg.exe add "$regKey" /v RealTimeIsUniversal /t REG_QWORD /d 1 /f | Out-Null
     $rtcExit = $LASTEXITCODE
 } else {
     Write-Host "Requesting elevation to set RealTimeIsUniversal (HKLM)..."
-    $p = Start-Process -FilePath $regEnv -ArgumentList 'add', "`"$tsKey`"", '/v', 'RealTimeIsUniversal', '/t', 'REG_QWORD', '/d', '1', '/f' -Verb RunAs -Wait -PassThru
+    $p = Start-Process -FilePath 'reg.exe' -ArgumentList 'add', $regKey, '/v', 'RealTimeIsUniversal', '/t', 'REG_QWORD', '/d', '1', '/f' -Verb RunAs -Wait -PassThru
     $p.WaitForExit()
     $rtcExit = $p.ExitCode
 }
