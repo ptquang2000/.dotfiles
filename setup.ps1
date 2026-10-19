@@ -216,6 +216,19 @@ if (-not (Get-Command gh -ErrorAction SilentlyContinue)) {
     }
 }
 
+Write-Section "Enable Cloudflare WARP"
+Refresh-Path
+$WarpCli = (Get-Command warp-cli -ErrorAction SilentlyContinue).Source
+if (-not $WarpCli) { $WarpCli = Join-Path $env:ProgramFiles 'Cloudflare\Cloudflare WARP\warp-cli.exe' }
+if (-not (Test-Path -LiteralPath $WarpCli)) {
+    Write-Warning "warp-cli not found; skipping WARP setup (install with: winget install Cloudflare.Warp)."
+} else {
+    & $WarpCli --accept-tos mode warp
+    if ($LASTEXITCODE -ne 0) { Write-Warning "Failed to set WARP mode to warp." }
+    & $WarpCli --accept-tos connect
+    if ($LASTEXITCODE -ne 0) { Write-Warning "Failed to connect WARP." }
+}
+
 Write-Section "Set hardware clock to UTC (dual-boot fix)"
 $regKey = 'HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation'
 if (Test-IsAdmin) {
