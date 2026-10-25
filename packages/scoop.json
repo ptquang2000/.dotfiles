@@ -113,6 +113,14 @@
         {
             "Name": "Cascadia-Code",
             "Source": "nerd-fonts"
+        },
+        {
+            "Name": "mpv",
+            "Source": "extras"
+        },
+        {
+            "Name": "firefox-developer",
+            "Source": "versions"
         }
     ]
 }
