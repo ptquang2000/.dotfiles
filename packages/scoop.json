@@ -31,14 +31,6 @@
             "Source": "main"
         },
         {
-            "Name": "llvm",
-            "Source": "main"
-        },
-        {
-            "Name": "cmake",
-            "Source": "main"
-        },
-        {
             "Name": "docker",
             "Source": "main"
         },
@@ -56,10 +48,6 @@
         },
         {
             "Name": "jq",
-            "Source": "main"
-        },
-        {
-            "Name": "nodejs",
             "Source": "main"
         },
         {
@@ -103,23 +91,11 @@
             "Source": "main"
         },
         {
-            "Name": "openjdk21",
-            "Source": "java"
-        },
-        {
             "Name": "opencode",
             "Source": "main"
         },
         {
             "Name": "7zip",
-            "Source": "main"
-        },
-        {
-            "Name": "ninja",
-            "Source": "main"
-        },
-        {
-            "Name": "dotnet-sdk",
             "Source": "main"
         },
         {
@@ -129,10 +105,6 @@
         {
             "Name": "notepadplusplus",
             "Source": "extras"
-        },
-        {
-            "Name": "msbuild-extractor-sample",
-            "Source": "personal"
         },
         {
             "Name": "sioyek",

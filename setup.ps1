@@ -160,10 +160,15 @@ if (Test-InDotfilesRepo -Path $ScriptRoot) {
 
 Write-Section "Link dotfiles"
 $documents = [Environment]::GetFolderPath('MyDocuments')
+$scoop_persist = Join-Path $env:USERPROFILE 'scoop\persist'
 $junctions = @(
-    @{ Source = Join-Path $ScriptRoot 'powershell'; Target = Join-Path $documents       'PowerShell' }
     @{ Source = Join-Path $ScriptRoot 'nvim-init';  Target = Join-Path $env:LOCALAPPDATA 'nvim'	}
     @{ Source = Join-Path $ScriptRoot 'psmux';      Target = Join-Path $env:USERPROFILE  '.config\psmux'	}
+
+    @{ Source = Join-Path $ScriptRoot 'powershell'; Target = Join-Path $documents 'Powershell' }
+
+    @{ Source = Join-Path $ScriptRoot 'mpv';        Target = Join-Path $scoop_persist 'mpv\portable_config'	}
+    @{ Source = Join-Path $ScriptRoot 'sioyek';     Target = Join-Path $scoop_persist 'sioyek' }
 )
 foreach ($j in $junctions) {
     New-DotfilesJunction -Source $j.Source -Target $j.Target
@@ -194,7 +199,7 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
     throw "winget is not available on PATH. Re-run this script in a fresh shell."
 }
 Write-Host "Importing packages from: $WingetJson"
-winget import -i $WingetJson --accept-package-agreements --accept-source-agreements --disable-interactivity
+# winget import -i $WingetJson --accept-package-agreements --accept-source-agreements --disable-interactivity
 if ($LASTEXITCODE -ne 0) {
     throw "winget import failed with exit code $LASTEXITCODE."
 }
