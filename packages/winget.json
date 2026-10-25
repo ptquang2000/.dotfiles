@@ -1,6 +1,23 @@
 {
-    "$schema": "https://aka.ms/winget-packages.schema.2.0.json",
-    "CreationDate": "2026-08-07T00:00:00.000-00:00",
-    "Sources": [],
-    "WinGetVersion": "1.11.400"
+  "$schema": "https://aka.ms/winget-packages.schema.2.0.json",
+  "CreationDate": "2026-10-25T15:36:00.000Z",
+  "WinGetVersion": "1.8.1911",
+  "Sources": [
+    {
+      "Packages": [
+        {
+          "PackageIdentifier": "Cloudflare.Warp"
+        },
+        {
+          "PackageIdentifier": "Microsoft.VisualStudio.2022.Community"
+        }
+      ],
+      "SourceDetails": {
+        "Argument": "https://cdn.winget.microsoft.com/cache",
+        "Identifier": "Microsoft.Winget.Source_8wekyb3d8bbwe",
+        "Name": "winget",
+        "Type": "Microsoft.PreIndexed.Package"
+      }
+    }
+  ]
 }

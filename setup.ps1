@@ -199,7 +199,7 @@ if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
     throw "winget is not available on PATH. Re-run this script in a fresh shell."
 }
 Write-Host "Importing packages from: $WingetJson"
-# winget import -i $WingetJson --accept-package-agreements --accept-source-agreements --disable-interactivity
+winget import -i $WingetJson --accept-package-agreements --accept-source-agreements --disable-interactivity
 if ($LASTEXITCODE -ne 0) {
     throw "winget import failed with exit code $LASTEXITCODE."
 }
