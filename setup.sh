@@ -275,7 +275,7 @@ link_configs() {
     link "$DOTS/zsh"              "$CONFIG/zsh"
     link "$DOTS/tmux"             "$CONFIG/tmux"
     link "$DOTS/tmux-sessionizer" "$CONFIG/tmux-sessionizer"
-    link "$DOTS/opencode/skills"  "$CONFIG/opencode/skills"
+    link "$DOTS/opencode"  "$CONFIG/opencode"
 
     link "$DOTS/.zshenv"          "$HOME/.zshenv"
     link "$DOTS/.bashrc"          "$HOME/.bashrc"

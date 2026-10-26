@@ -159,9 +159,16 @@ if (Test-InDotfilesRepo -Path $ScriptRoot) {
 }
 
 Write-Section "Link dotfiles"
+$OcSource = Join-Path $ScriptRoot 'opencode'
+$OcTarget = Join-Path $env:USERPROFILE '.config\opencode'
+if ((Test-Path -LiteralPath $OcTarget) -and -not (Test-IsJunction -Path $OcTarget) -and (Test-Path -LiteralPath (Join-Path $OcTarget 'service.json'))) {
+    Move-Item -LiteralPath (Join-Path $OcTarget 'service.json') -Destination (Join-Path $OcSource 'service.json') -Force
+}
+
 $documents = [Environment]::GetFolderPath('MyDocuments')
 $scoop_persist = Join-Path $env:USERPROFILE 'scoop\persist'
 $junctions = @(
+    @{ Source = Join-Path $ScriptRoot 'opencode'; Target = $OcTarget }
     @{ Source = Join-Path $ScriptRoot 'nvim-init';  Target = Join-Path $env:LOCALAPPDATA 'nvim'	}
     @{ Source = Join-Path $ScriptRoot 'psmux';      Target = Join-Path $env:USERPROFILE  '.config\psmux'	}
 
