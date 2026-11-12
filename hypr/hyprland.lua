@@ -10,7 +10,8 @@ hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" 
 
 local terminal = "ghostty"
 local menu = 'bemenu-run --fn "CaskaydiaCove Nerd Font" --hp 6 w'
-local browser = "google-chrome-stable"
+local browser = "firefox"
+local document = "sioyek"
 
 -- #############################
 -- ### ENVIRONMENT VARIABLES ###
@@ -148,8 +149,6 @@ hl.device({
 
 local mainMod = "SUPER"
 
-hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + W", hl.dsp.window.close())
 hl.bind(mainMod .. " + SHIFT + Q", hl.dsp.exec_cmd("systemctl poweroff"))
 hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exit())
@@ -212,7 +211,7 @@ hl.bind(
 -- ### WINDOWS AND WORKSPACES ###
 -- ##############################
 
-hl.window_rule({ match = { class = "^(google-chrome)$" }, workspace = "1" })
+hl.window_rule({ match = { class = "^(firefox)$" }, workspace = "1" })
 hl.window_rule({ match = { class = "^(com.mitchellh.ghostty)$" }, workspace = "2" })
 
 hl.window_rule({ match = { title = "^([Pp]icture[\\-\\s]in[\\-\\s][Pp]icture)$" }, float = true, pin = true })

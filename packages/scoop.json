@@ -99,10 +99,6 @@
             "Source": "main"
         },
         {
-            "Name": "googlechrome",
-            "Source": "extras"
-        },
-        {
             "Name": "notepadplusplus",
             "Source": "extras"
         },
@@ -116,6 +112,10 @@
         },
         {
             "Name": "mpv",
+            "Source": "extras"
+        },
+        {
+            "Name": "firefox",
             "Source": "extras"
         },
         {
