@@ -41,7 +41,7 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Downloads")
   hl.exec_cmd("mkdir -p " .. os.getenv("HOME") .. "/Pictures/Screenshots")
   hl.exec_cmd("ghostty")
-  hl.exec_cmd("google-chrome-stable")
+  hl.exec_cmd("firefox")
 end)
 
 -- #####################
